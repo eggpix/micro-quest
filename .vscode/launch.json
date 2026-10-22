@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug play_game.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/play/play_game.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug game_editor.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/play/game_editor.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}

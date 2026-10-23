@@ -1,3 +1,6 @@
+import os
+import json
+
 clear_after_menu = True
 def clear_terminal() -> None:
     print("\033[2J\033[H", end="")
@@ -32,7 +35,7 @@ class ListMenu:
         """
         while True:
             self.show()
-            selection = input("Select an Option: ")
+            selection = input("> ")
             selection = selection.lower().strip()
             if selection in self.options:
                 return selection
@@ -41,7 +44,29 @@ class Game:
     """Main game class."""
 
     def __init__(self) -> None:
-        pass
+        self.game_data: dict = None
+
+    def get_game_file(self) -> None:
+        while True:
+            clear_terminal()
+            print("Input the file path of your game to get started.")
+            print(f"Current working directory: {os.getcwd()}")
+            print("[0] Cancel")
+            file_path = input("> ")
+            if file_path == "0":
+                return
+            else:
+                try:
+                    with open(file_path, "r", encoding="utf-8") as file:
+                        try:
+                            self.game_data = json.load(file)
+                            return
+                        except json.decoder.JSONDecodeError:
+                            print("There's a formatting error in the quest file you requested.")
+                            input("> ")
+                except FileNotFoundError:
+                    print("The file you requested does not exist.")
+                    input("> ")
 
     def run(self) -> None:
         """Runs main game loop"""
@@ -53,8 +78,7 @@ class Game:
                 case "0":
                     return
                 case "1":
-                    # LOAD GAME
-                    pass
+                    self.get_game_file()
 
 if __name__ == "__main__":
     game = Game()

@@ -3,6 +3,8 @@
     "title": "Sword Quest",
     "description": "Welcome to a world made of code where each kingdom speaks a different programming language. Combine your programming knowledge with the wisdom of locals to reach the center of the world and claim the Sword of Programming.",
 
+    "status": "template",
+
     "player": {
         "name": "",
         "inventory": []

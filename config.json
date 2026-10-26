@@ -1,5 +1,6 @@
 {
     "clear_terminal": true,
     "text_formatting": true,
-    "concatenate_dialogue": true
+    "concatenate_dialogue": false,
+    "wrap_text": true
 }

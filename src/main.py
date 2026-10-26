@@ -10,6 +10,7 @@ can load these files into the Micro Quest engine to play through the adventure.
 import argparse
 import json
 import os
+from pydoc import text
 
 import config
 import text_display
@@ -30,13 +31,15 @@ class Game:
     def __init__(self) -> None:
         self.game_data: dict | None = None
         self.config = config.load_config()
+        self.display = text_display.TextDisplay(self.config)
 
     def play_game(self) -> None:
         """Main loop for quest game."""
         if self.config["clear_terminal"]:
-            text_display.clear_terminal()
-        print("Game is running...")
-        input("> ")
+            self.display.clear_terminal()
+        self.display.display_title(self.game_data["title"])
+        self.display.display_dialogue(self.game_data["description"], clear=False)
+        input("... ")
 
     def open_json_file(self, file_path: str) -> dict | None:
         """Opens a JSON file and returns its contents as a dictionary."""
@@ -47,17 +50,17 @@ class Game:
                     return data
                 except json.decoder.JSONDecodeError:
                     print("There was a formatting error in the file you requested.")
-                    input("> ")
+                    input("... ")
                     return None
         except FileNotFoundError:
             print("The file you requested does not exist.")
-            input("> ")
+            input("... ")
             return None
 
     def get_game_file(self) -> bool:
         while True:
             if self.config["clear_terminal"]:
-                text_display.clear_terminal()
+                self.display.clear_terminal()
             print("Input the file path of your game to get started.")
             print(f"Current working directory: {os.getcwd()}")
             print("[0] Cancel")
@@ -80,8 +83,8 @@ class Game:
         else:
             while True:
                 primary_options = {"1":"Load Game", "0":"Exit"}
-                primary_menu = text_display.ListMenu("Welcome to Micro Quest!", primary_options)
-                selection = primary_menu.get_input(self.config["clear_terminal"])
+                primary_menu = text_display.ListMenu("Welcome to Micro Quest!", primary_options, self.display)
+                selection = primary_menu.get_input()
                 match selection:
                     case "0":
                         return

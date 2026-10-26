@@ -6,7 +6,8 @@ filename = "config.json"
 default_data = {
     "clear_terminal": True,
     "text_formatting": True,
-    "concatenate_dialogue": False
+    "concatenate_dialogue": False,
+    "wrap_text": True
 }
 
 def load_config() -> dict:

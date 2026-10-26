@@ -1,7 +1,8 @@
 """File containing functions and classes for displaying text in the terminal."""
 
-import text_display
 import re
+
+import text_display
 
 def clear_terminal() -> None:
     print("\033[2J\033[H", end="")

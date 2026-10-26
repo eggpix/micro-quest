@@ -7,16 +7,28 @@ information about the game, including the story, choices, and outcomes. Players
 can load these files into the Micro Quest engine to play through the adventure.
 """
 
-import text_display
-import config
-import os
+import argparse
 import json
+import os
+
+import config
+import text_display
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Micro Quest: A text-based adventure game engine."
+    )
+    parser.add_argument("-f", "--file", help="Quickly load a game from file path")
+    args = parser.parse_args()
+
+    game = Game()
+    game.run(args.file)
 
 class Game:
     """Main game class."""
 
     def __init__(self) -> None:
-        self.game_data: dict = None
+        self.game_data: dict | None = None
         self.config = config.load_config()
 
     def play_game(self) -> None:
@@ -25,6 +37,22 @@ class Game:
             text_display.clear_terminal()
         print("Game is running...")
         input("> ")
+
+    def open_json_file(self, file_path: str) -> dict | None:
+        """Opens a JSON file and returns its contents as a dictionary."""
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                try:
+                    data = json.load(file)
+                    return data
+                except json.decoder.JSONDecodeError:
+                    print("There was a formatting error in the file you requested.")
+                    input("> ")
+                    return None
+        except FileNotFoundError:
+            print("The file you requested does not exist.")
+            input("> ")
+            return None
 
     def get_game_file(self) -> bool:
         while True:
@@ -37,33 +65,31 @@ class Game:
             if file_path == "0":
                 return False
             else:
-                try:
-                    with open(file_path, "r", encoding="utf-8") as file:
-                        try:
-                            self.game_data = json.load(file)
-                            return True
-                        except json.decoder.JSONDecodeError:
-                            print("There's a formatting error in the quest file you requested.")
-                            input("> ")
-                except FileNotFoundError:
-                    print("The file you requested does not exist.")
-                    input("> ")
+                data = self.open_json_file(file_path)
+                if data is not None:
+                    self.game_data = data
+                    return True
 
-    def run(self) -> None:
+    def run(self, file_path: str | None = None) -> None:
         """Runs main game loop"""
-        while True:
-            primary_options = {"1":"Load Game", "0":"Exit"}
-            primary_menu = text_display.ListMenu("Welcome to Micro Quest!", primary_options)
-            selection = primary_menu.get_input(self.config["clear_terminal"])
-            match selection:
-                case "0":
-                    return
-                case "1":
-                    if self.get_game_file():
-                        self.play_game()
-                    else:
-                        continue
+        if file_path is not None:
+            data = self.open_json_file(file_path)
+            if data is not None:
+                self.game_data = data
+                self.play_game()
+        else:
+            while True:
+                primary_options = {"1":"Load Game", "0":"Exit"}
+                primary_menu = text_display.ListMenu("Welcome to Micro Quest!", primary_options)
+                selection = primary_menu.get_input(self.config["clear_terminal"])
+                match selection:
+                    case "0":
+                        return
+                    case "1":
+                        if self.get_game_file():
+                            self.play_game()
+                        else:
+                            continue
 
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+    main()

@@ -73,6 +73,34 @@ class Game:
                     self.game_data = data
                     return True
 
+    def config_menu(self) -> None:
+        """Display the configuration menu."""
+        while True:
+            if self.config["clear_terminal"]:
+                self.display.clear_terminal()
+            options = {
+                "1": f"Toggle clear terminal ({'Enabled' if self.config['clear_terminal'] else 'Disabled'})",
+                "2": f"Toggle text formatting ({'Enabled' if self.config['text_formatting'] else 'Disabled'})",
+                "3": f"Toggle concatenate dialogue ({'Enabled' if self.config['concatenate_dialogue'] else 'Disabled'})",
+                "4": f"Toggle wrap text ({'Enabled' if self.config['wrap_text'] else 'Disabled'})",
+                "0": "Exit"
+            }
+            menu = text_display.ListMenu("Configuration Menu", options, self.display)
+            selection = menu.get_input()
+            match selection:
+                case "0":
+                    return
+                case "1":
+                    self.config["clear_terminal"] = not self.config["clear_terminal"]
+                case "2":
+                    self.config["text_formatting"] = not self.config["text_formatting"]
+                case "3":
+                    self.config["concatenate_dialogue"] = not self.config["concatenate_dialogue"]
+                case "4":
+                    self.config["wrap_text"] = not self.config["wrap_text"]
+
+            config.save_config(self.config)
+
     def run(self, file_path: str | None = None) -> None:
         """Runs main game loop"""
         if file_path is not None:
@@ -82,7 +110,7 @@ class Game:
                 self.play_game()
         else:
             while True:
-                primary_options = {"1":"Load Game", "0":"Exit"}
+                primary_options = {"1":"Load Game", "2": "Options", "0":"Exit"}
                 primary_menu = text_display.ListMenu("Welcome to Micro Quest!", primary_options, self.display)
                 selection = primary_menu.get_input()
                 match selection:
@@ -93,6 +121,9 @@ class Game:
                             self.play_game()
                         else:
                             continue
+                    case "2":
+                        self.config_menu()
+                        pass
 
 if __name__ == "__main__":
     main()

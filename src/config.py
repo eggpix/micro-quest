@@ -20,3 +20,8 @@ def load_config() -> dict:
             json.dump(default_data, file, indent=4)
         data = default_data
     return data
+
+def save_config(data: dict) -> None:
+    """Saves the given data to config.json file."""
+    with open(filename, "w") as file:
+        json.dump(data, file, indent=4)

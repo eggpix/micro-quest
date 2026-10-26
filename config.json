@@ -2,5 +2,6 @@
     "clear_terminal": true,
     "text_formatting": true,
     "concatenate_dialogue": false,
-    "wrap_text": true
+    "wrap_text": true,
+    "last_save_file": "sample/sample_game.json"
 }

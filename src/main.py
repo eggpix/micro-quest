@@ -71,6 +71,7 @@ class Game:
                 data = self.open_json_file(file_path)
                 if data is not None:
                     self.game_data = data
+                    self.save_last_save(file_path)
                     return True
 
     def config_menu(self) -> None:
@@ -101,16 +102,34 @@ class Game:
 
             config.save_config(self.config)
 
+    def load_last_save(self) -> None:
+        """Load the last save file if it exists."""
+        last_save_file = self.config.get("last_save_file")
+        if last_save_file and os.path.exists(last_save_file):
+            data = self.open_json_file(last_save_file)
+            if data is not None:
+                self.game_data = data
+                self.play_game()
+        else:
+            print("No last save file found.")
+            input("... ")
+
+    def save_last_save(self, file_path: str) -> None:
+        """Save the current game state to the last save file."""
+        self.config["last_save_file"] = file_path
+        config.save_config(self.config)
+
     def run(self, file_path: str | None = None) -> None:
         """Runs main game loop"""
         if file_path is not None:
             data = self.open_json_file(file_path)
             if data is not None:
                 self.game_data = data
+                self.save_last_save(file_path)
                 self.play_game()
         else:
             while True:
-                primary_options = {"1":"Load Game", "2": "Options", "0":"Exit"}
+                primary_options = {"1":"Load Game", "2": "Load Last Save", "3": "Options", "0":"Exit"}
                 primary_menu = text_display.ListMenu("Welcome to Micro Quest!", primary_options, self.display)
                 selection = primary_menu.get_input()
                 match selection:
@@ -122,6 +141,8 @@ class Game:
                         else:
                             continue
                     case "2":
+                        self.load_last_save()
+                    case "3":
                         self.config_menu()
                         pass
 

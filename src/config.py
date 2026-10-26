@@ -7,7 +7,8 @@ default_data = {
     "clear_terminal": True,
     "text_formatting": True,
     "concatenate_dialogue": False,
-    "wrap_text": True
+    "wrap_text": True,
+    "last_save_file": ""
 }
 
 def load_config() -> dict:

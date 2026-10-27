@@ -53,7 +53,7 @@ class Game:
             if self.config["clear_terminal"]:
                 self.display.clear_terminal()
             print("Input the file path of your game to get started.")
-            print(f"Current working directory: {os.getcwd()}")
+            print(self.display.format(f"Current working directory: \x1B[34m{os.getcwd()}\x1B[0m"))
             print("[0] Cancel")
             file_path = input("> ")
             if file_path == "0":

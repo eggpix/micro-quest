@@ -4,6 +4,7 @@ import re
 import shutil
 import textwrap
 
+
 class TextDisplay:
     """Displays terminal text according to the user's configuration."""
 
@@ -35,10 +36,7 @@ class TextDisplay:
             width = shutil.get_terminal_size().columns
 
             if isinstance(text, list):
-                text = [
-                    textwrap.fill(line, width=width)
-                    for line in text
-                ]
+                text = [textwrap.fill(line, width=width) for line in text]
             else:
                 text = textwrap.fill(text, width=width)
 
@@ -56,7 +54,9 @@ class TextDisplay:
 
         print(title)
 
-    def display_dialogue(self, text: str | list[str], clear: bool | None = None) -> None:
+    def display_dialogue(
+        self, text: str | list[str], clear: bool | None = None
+    ) -> None:
         """Display dialogue according to the user's settings."""
         if clear is None:
             clear = self.config["clear_terminal"]
@@ -88,9 +88,6 @@ class ListMenu:
 
     def show(self) -> None:
         """Display the menu, optionally clearing the terminal."""
-        if self.display.config["clear_terminal"]:
-            self.display.clear_terminal()
-
         self.display.display_title(self.title)
 
         for key, option in self.options.items():

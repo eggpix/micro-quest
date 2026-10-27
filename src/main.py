@@ -8,14 +8,15 @@ can load these files into the Micro Quest engine to play through the adventure.
 """
 
 import argparse
-import json
 import os
-from pydoc import text
+from pathlib import Path
 
 import config
+import game_data
 import text_display
 
-def main():
+
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Micro Quest: A text-based adventure game engine."
     )
@@ -25,39 +26,29 @@ def main():
     game = Game()
     game.run(args.file)
 
+
 class Game:
     """Main game class."""
 
     def __init__(self) -> None:
-        self.game_data: dict | None = None
+        self.game_data: game_data.GameData = game_data.GameData()
         self.config = config.load_config()
         self.display = text_display.TextDisplay(self.config)
 
-    def play_game(self) -> None:
-        """Main loop for quest game."""
-        if self.config["clear_terminal"]:
-            self.display.clear_terminal()
-        self.display.display_title(self.game_data["title"])
-        self.display.display_dialogue(self.game_data["description"], clear=False)
-        input("... ")
+    def await_input(self) -> None:
+        input("Press Enter to continue... ")
 
-    def open_json_file(self, file_path: str) -> dict | None:
-        """Opens a JSON file and returns its contents as a dictionary."""
-        try:
-            with open(file_path, "r", encoding="utf-8") as file:
-                try:
-                    data = json.load(file)
-                    return data
-                except json.decoder.JSONDecodeError:
-                    print("There was a formatting error in the file you requested.")
-                    input("... ")
-                    return None
-        except FileNotFoundError:
-            print("The file you requested does not exist.")
-            input("... ")
-            return None
+    def play_game(self) -> None:
+        data = self.game_data.data
+        if data is None:
+            return
+
+        self.display.display_title(data.get("title") or "Untitled")
+        self.display.display_dialogue(data.get("description") or "", clear=False)
+        self.await_input()
 
     def get_game_file(self) -> bool:
+        """Prompt until a game file loads successfully or the user cancels."""
         while True:
             if self.config["clear_terminal"]:
                 self.display.clear_terminal()
@@ -67,38 +58,75 @@ class Game:
             file_path = input("> ")
             if file_path == "0":
                 return False
-            else:
-                data = self.open_json_file(file_path)
-                if data is not None:
-                    self.game_data = data
-                    self.save_last_save(file_path)
-                    return True
+            if self.load_game(file_path):
+                return True
+
+    def load_game(self, file_path: str) -> bool:
+        """Load a game, activating template files into a separate copy."""
+        if not self.game_data.load_game_file(file_path):
+            self.await_input()
+            return False
+
+        data = self.game_data.data
+        if data is None:
+            return False
+
+        if data.get("status") == "template":
+            if not self.create_active_copy(file_path):
+                return False
+            file_path = self.game_data.data_path or file_path
+
+        self.save_last_save(file_path)
+        return True
+
+    def create_active_copy(self, template_path: str) -> bool:
+        """Prompt for and create a new active copy of the loaded template."""
+        if self.game_data.data is None:
+            return False
+
+        confirmation = input("This game is a template. Create an active copy? [y/N] ")
+        if confirmation.strip().lower() not in {"y", "yes"}:
+            return False
+
+        source = Path(template_path)
+        default_path = source.with_name(f"{source.stem}_active{source.suffix or '.json'}")
+        while True:
+            destination = input(
+                f"Save the active copy as [{default_path}] (0 to cancel): "
+            ).strip()
+            if destination == "0":
+                return False
+            destination = destination or str(default_path)
+            if Path(destination).exists():
+                print(f"A file already exists at '{destination}'. Choose another path.")
+                continue
+
+            self.game_data.data["status"] = "active"
+            if self.game_data.save_game_file_as(destination):
+                return True
+            self.game_data.data["status"] = "template"
 
     def config_menu(self) -> None:
         """Display the configuration menu."""
+        settings = {
+            "1": ("clear_terminal", "Toggle clear terminal"),
+            "2": ("text_formatting", "Toggle text formatting"),
+            "3": ("concatenate_dialogue", "Toggle concatenate dialogue"),
+            "4": ("wrap_text", "Toggle wrap text"),
+        }
         while True:
-            if self.config["clear_terminal"]:
-                self.display.clear_terminal()
             options = {
-                "1": f"Toggle clear terminal ({'Enabled' if self.config['clear_terminal'] else 'Disabled'})",
-                "2": f"Toggle text formatting ({'Enabled' if self.config['text_formatting'] else 'Disabled'})",
-                "3": f"Toggle concatenate dialogue ({'Enabled' if self.config['concatenate_dialogue'] else 'Disabled'})",
-                "4": f"Toggle wrap text ({'Enabled' if self.config['wrap_text'] else 'Disabled'})",
-                "0": "Exit"
+                key: f"{label} ({'Enabled' if self.config[name] else 'Disabled'})"
+                for key, (name, label) in settings.items()
             }
+            options["0"] = "Exit"
             menu = text_display.ListMenu("Configuration Menu", options, self.display)
             selection = menu.get_input()
-            match selection:
-                case "0":
-                    return
-                case "1":
-                    self.config["clear_terminal"] = not self.config["clear_terminal"]
-                case "2":
-                    self.config["text_formatting"] = not self.config["text_formatting"]
-                case "3":
-                    self.config["concatenate_dialogue"] = not self.config["concatenate_dialogue"]
-                case "4":
-                    self.config["wrap_text"] = not self.config["wrap_text"]
+            if selection == "0":
+                return
+
+            name, _ = settings[selection]
+            self.config[name] = not self.config[name]
 
             config.save_config(self.config)
 
@@ -106,13 +134,11 @@ class Game:
         """Load the last save file if it exists."""
         last_save_file = self.config.get("last_save_file")
         if last_save_file and os.path.exists(last_save_file):
-            data = self.open_json_file(last_save_file)
-            if data is not None:
-                self.game_data = data
+            if self.load_game(last_save_file):
                 self.play_game()
         else:
             print("No last save file found.")
-            input("... ")
+            self.await_input()
 
     def save_last_save(self, file_path: str) -> None:
         """Save the current game state to the last save file."""
@@ -120,31 +146,34 @@ class Game:
         config.save_config(self.config)
 
     def run(self, file_path: str | None = None) -> None:
-        """Runs main game loop"""
+        """Run the game directly or display the main menu."""
         if file_path is not None:
-            data = self.open_json_file(file_path)
-            if data is not None:
-                self.game_data = data
-                self.save_last_save(file_path)
+            if self.load_game(file_path):
                 self.play_game()
-        else:
-            while True:
-                primary_options = {"1":"Load Game", "2": "Load Last Save", "3": "Options", "0":"Exit"}
-                primary_menu = text_display.ListMenu("Welcome to Micro Quest!", primary_options, self.display)
-                selection = primary_menu.get_input()
-                match selection:
-                    case "0":
-                        return
-                    case "1":
-                        if self.get_game_file():
-                            self.play_game()
-                        else:
-                            continue
-                    case "2":
-                        self.load_last_save()
-                    case "3":
-                        self.config_menu()
-                        pass
+            return
+
+        primary_options = {
+            "1": "Load Game",
+            "2": "Load Last Save",
+            "3": "Options",
+            "0": "Exit",
+        }
+        while True:
+            primary_menu = text_display.ListMenu(
+                "Welcome to Micro Quest!", primary_options, self.display
+            )
+            selection = primary_menu.get_input()
+            match selection:
+                case "0":
+                    return
+                case "1":
+                    if self.get_game_file():
+                        self.play_game()
+                case "2":
+                    self.load_last_save()
+                case "3":
+                    self.config_menu()
+
 
 if __name__ == "__main__":
     main()

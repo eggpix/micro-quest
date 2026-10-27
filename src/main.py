@@ -47,6 +47,21 @@ class Game:
         self.display.display_dialogue(data.get("description") or "", clear=False)
         self.await_input()
 
+        while True:
+            if self.config["clear_terminal"]:
+                self.display.clear_terminal()
+            room_options = {
+                "0": "Save and Exit",
+            }
+            room_menu = text_display.ListMenu(
+                "Choose an option:", room_options, self.display
+            )
+            selection = room_menu.get_input()
+            match selection:
+                case "0":
+                    self.game_data.save_game_file()
+                    return
+
     def get_game_file(self) -> bool:
         """Prompt until a game file loads successfully or the user cancels."""
         while True:
@@ -84,6 +99,8 @@ class Game:
         source = Path(template_path)
         default_path = source.with_name(f"{source.stem}_copy{source.suffix or '.json'}")
         while True:
+            if self.config["clear_terminal"]:
+                self.display.clear_terminal()
             print(f"This game file is a template. To play, you must create a new copy to store your progress.")
             print(self.display.format(f"Enter a file path to create a new copy (default: \x1B[34m{default_path}\x1B[0m)."))
             print("[0] Cancel")
@@ -129,7 +146,8 @@ class Game:
         last_save_file = self.config.get("last_save_file")
         if last_save_file and os.path.exists(last_save_file):
             if self.load_game(last_save_file):
-                self.display.clear_terminal()
+                if self.config["clear_terminal"]:
+                    self.display.clear_terminal()
                 print(self.display.format(f"Load game \x1B[34m{last_save_file}\x1B[0m?"))
                 print("[y/n]")
                 if input("> ").strip().lower() in ("y", "yes"):

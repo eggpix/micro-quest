@@ -92,7 +92,7 @@ class Game:
                 return False
             destination = destination or str(default_path)
             if Path(destination).exists():
-                print(f"A file already exists at '{destination}'. Choose another path.")
+                print(self.display.format(f"A file already exists at '\x1B[34m{destination}\x1B[0m'. Choose another path."))
                 continue
 
             self.game_data.data["status"] = "active"
@@ -129,7 +129,11 @@ class Game:
         last_save_file = self.config.get("last_save_file")
         if last_save_file and os.path.exists(last_save_file):
             if self.load_game(last_save_file):
-                self.play_game()
+                self.display.clear_terminal()
+                print(self.display.format(f"Load game \x1B[34m{last_save_file}\x1B[0m?"))
+                print("[y/n]")
+                if input("> ").strip().lower() in ("y", "yes"):
+                    self.play_game()
         else:
             print("No last save file found.")
             self.await_input()

@@ -81,19 +81,13 @@ class Game:
 
     def create_active_copy(self, template_path: str) -> bool:
         """Prompt for and create a new active copy of the loaded template."""
-        if self.game_data.data is None:
-            return False
-
-        confirmation = input("This game is a template. Create an active copy? [y/N] ")
-        if confirmation.strip().lower() not in {"y", "yes"}:
-            return False
-
         source = Path(template_path)
-        default_path = source.with_name(f"{source.stem}_active{source.suffix or '.json'}")
+        default_path = source.with_name(f"{source.stem}_copy{source.suffix or '.json'}")
         while True:
-            destination = input(
-                f"Save the active copy as [{default_path}] (0 to cancel): "
-            ).strip()
+            print(f"This game file is a template. To play, you must create a new copy to store your progress.")
+            print(self.display.format(f"Enter a file path to create a new copy (default: \x1B[34m{default_path}\x1B[0m)."))
+            print("[0] Cancel")
+            destination = input("> ").strip()
             if destination == "0":
                 return False
             destination = destination or str(default_path)

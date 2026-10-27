@@ -23,7 +23,7 @@ class TextDisplay:
         """Remove ANSI escape sequences from text."""
         return self.ANSI_ESCAPE.sub("", text)
 
-    def _format_text(self, text: str | list[str]) -> str | list[str]:
+    def format(self, text: str | list[str]) -> str | list[str]:
         """Apply formatting and wrapping according to configuration."""
 
         if not self.config["text_formatting"]:
@@ -55,7 +55,7 @@ class TextDisplay:
         print(title)
 
     def display_dialogue(
-        self, text: str | list[str], clear: bool | None = None
+        self, text: str, clear: bool | None = None
     ) -> None:
         """Display dialogue according to the user's settings."""
         if clear is None:
@@ -63,13 +63,7 @@ class TextDisplay:
         if clear:
             self.clear_terminal()
 
-        if (
-            self.config["concatenate_dialogue"]
-            and isinstance(text, list)
-        ):
-            text = "\n".join(text)
-
-        text = self._format_text(text)
+        text = self.format(text)
         print(text)
 
 

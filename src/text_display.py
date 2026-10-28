@@ -23,22 +23,14 @@ class TextDisplay:
         """Remove ANSI escape sequences from text."""
         return self.ANSI_ESCAPE.sub("", text)
 
-    def format(self, text: str | list[str]) -> str | list[str]:
+    def format(self, text: str) -> str:
         """Apply formatting and wrapping according to configuration."""
-
         if not self.config["text_formatting"]:
-            if isinstance(text, list):
-                text = [self.remove_formatting(line) for line in text]
-            else:
-                text = self.remove_formatting(text)
+            text = self.remove_formatting(text)
 
         if self.config["wrap_text"]:
             width = shutil.get_terminal_size().columns
-
-            if isinstance(text, list):
-                text = [textwrap.fill(line, width=width) for line in text]
-            else:
-                text = textwrap.fill(text, width=width)
+            text = textwrap.fill(text, width=width)
 
         return text
 

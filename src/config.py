@@ -1,86 +1,88 @@
-"""Loads config.json file for use in the game engine."""
+"""Load and save the game's configuration."""
 
 import json
+from typing import Any
 
 import text_display
 
-filename = "config.json"
-default_data = {
-    "clear_terminal": True,
-    "text_formatting": True,
-    "concatenate_dialogue": False,
-    "wrap_text": True,
-    "last_save_file": ""
-}
 
+class Config:
+    """Handles loading and saving of configuration settings."""
 
-def load_config(display: text_display.TextDisplay | None = None) -> dict:
-    """Loads config.json file and returns its contents as a dictionary."""
-    display = display or text_display.TextDisplay(
-        {"text_formatting": True, "wrap_text": False}
-    )
-    create_config = False
-    try:
-        with open(filename, "r", encoding="utf-8") as file:
-            data = json.load(file)
-    except FileNotFoundError:
-        data = {}
-        create_config = True
-    except json.JSONDecodeError as error:
-        display.text(
-            display.error(
-                f"Error: Invalid JSON in '{filename}': {error}. Using defaults."
-            )
-        )
-        data = {}
-    except OSError as error:
-        display.text(
-            display.error(
-                f"Error: Could not read '{filename}': {error}. Using defaults."
-            )
-        )
-        data = {}
+    DEFAULT_DATA: dict[str, Any] = {
+        "clear_terminal": True,
+        "text_formatting": True,
+        "concatenate_dialogue": False,
+        "wrap_text": True,
+        "last_save_file": "",
+    }
 
-    if not isinstance(data, dict):
-        display.text(
-            display.error(
-                f"Error: Configuration in '{filename}' must be a JSON object. "
-                "Using defaults."
-            )
-        )
-        data = {}
+    def __init__(self, display: text_display.TextDisplay) -> None:
+        self.display = display
+        self.filename = "config.json"
+        self.data: dict[str, Any] = self.DEFAULT_DATA.copy()
 
-    config_data = default_data.copy()
-    config_data.update(data)
-    for key, default_value in default_data.items():
-        if type(config_data[key]) is not type(default_value):
-            display.text(
-                display.error(
-                    f"Error: Invalid value for '{key}' in '{filename}'. "
-                    "Using the default."
+    def load_config(self) -> dict[str, Any]:
+        """Load settings from disk into this config instance."""
+        create_config = False
+        try:
+            with open(self.filename, "r", encoding="utf-8") as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            data = {}
+            create_config = True
+        except json.JSONDecodeError as error:
+            self.display.text(
+                self.display.error(
+                    f"Error: Invalid JSON in '{self.filename}': {error}. Using defaults."
                 )
             )
-            config_data[key] = default_value
-
-    if create_config:
-        save_config(config_data, display)
-
-    return config_data
-
-
-def save_config(
-    data: dict, display: text_display.TextDisplay | None = None
-) -> None:
-    """Saves the given data to config.json file."""
-    display = display or text_display.TextDisplay(
-        {"text_formatting": True, "wrap_text": False}
-    )
-    try:
-        with open(filename, "w", encoding="utf-8") as file:
-            json.dump(data, file, indent=4)
-    except (OSError, TypeError, ValueError) as error:
-        display.text(
-            display.error(
-                f"Error: Could not save configuration to '{filename}': {error}"
+            data = {}
+        except OSError as error:
+            self.display.text(
+                self.display.error(
+                    f"Error: Could not read '{self.filename}': {error}. Using defaults."
+                )
             )
-        )
+            data = {}
+
+        if not isinstance(data, dict):
+            self.display.text(
+                self.display.error(
+                    f"Error: Configuration in '{self.filename}' must be a JSON object. "
+                    "Using defaults."
+                )
+            )
+            data = {}
+
+        config_data = self.DEFAULT_DATA.copy()
+        config_data.update(data)
+        for key, default_value in self.DEFAULT_DATA.items():
+            if type(config_data[key]) is not type(default_value):
+                self.display.text(
+                    self.display.error(
+                        f"Error: Invalid value for '{key}' in '{self.filename}'. "
+                        "Using the default."
+                    )
+                )
+                config_data[key] = default_value
+
+        self.data.clear()
+        self.data.update(config_data)
+
+        if create_config:
+            self.save_config()
+
+        return self.data
+
+    def save_config(self) -> None:
+        """Save this config instance's settings to disk."""
+        try:
+            with open(self.filename, "w", encoding="utf-8") as file:
+                json.dump(self.data, file, indent=4)
+        except (OSError, TypeError, ValueError) as error:
+            self.display.text(
+                self.display.error(
+                    f"Error: Could not save configuration to '{self.filename}': {error}"
+                )
+            )

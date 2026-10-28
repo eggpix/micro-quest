@@ -30,9 +30,10 @@ class Game:
     """Main game class."""
 
     def __init__(self) -> None:
-        self.display = text_display.TextDisplay(config.default_data.copy())
-        self.config = config.load_config(self.display)
-        self.display.config = self.config
+        self.display = text_display.TextDisplay(config.Config.DEFAULT_DATA.copy())
+        self.config = config.Config(self.display)
+        self.config.load_config()
+        self.display.config = self.config.data
         self.game_data: game_data.GameData = game_data.GameData(self.display)
 
     def await_input(self) -> None:
@@ -136,7 +137,10 @@ class Game:
         }
         while True:
             options = {
-                key: f"{label} ({'Enabled' if self.config[name] else 'Disabled'})"
+                key: (
+                    f"{label} "
+                    f"({'Enabled' if self.config.data[name] else 'Disabled'})"
+                )
                 for key, (name, label) in settings.items()
             }
             options["0"] = "Exit"
@@ -146,13 +150,13 @@ class Game:
                 return
 
             name, _ = settings[selection]
-            self.config[name] = not self.config[name]
+            self.config.data[name] = not self.config.data[name]
 
-            config.save_config(self.config, self.display)
+            self.config.save_config()
 
     def load_last_save(self) -> None:
         """Load the last save file if it exists."""
-        last_save_file = self.config.get("last_save_file")
+        last_save_file = self.config.data.get("last_save_file")
         if last_save_file and Path(last_save_file).exists():
             if self.load_game(last_save_file):
                 self.display.clear_terminal()
@@ -168,8 +172,8 @@ class Game:
 
     def store_last_save(self, file_path: str) -> None:
         """Store the current game state to the last save file."""
-        self.config["last_save_file"] = file_path
-        config.save_config(self.config, self.display)
+        self.config.data["last_save_file"] = file_path
+        self.config.save_config()
 
     def run(self, file_path: str | None = None) -> None:
         """Run the game directly or display the main menu."""

@@ -7,7 +7,7 @@ import text_display
 
 
 class Config:
-    """Handles loading and saving of configuration settings."""
+    """Load, validate, and save the game's configuration settings."""
 
     DEFAULT_DATA: dict[str, Any] = {
         "clear_terminal": True,
@@ -18,6 +18,7 @@ class Config:
     }
 
     def __init__(self, display: text_display.TextDisplay) -> None:
+        """Create a config manager with default settings and a display."""
         self.display = display
         self.filename = "config.json"
         self.data: dict[str, Any] = self.DEFAULT_DATA.copy()
@@ -55,6 +56,7 @@ class Config:
             )
             data = {}
 
+        # Merge defaults before validating so newly added settings are available.
         config_data = self.DEFAULT_DATA.copy()
         config_data.update(data)
         for key, default_value in self.DEFAULT_DATA.items():

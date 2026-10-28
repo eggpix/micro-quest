@@ -7,13 +7,14 @@ import textwrap
 
 
 class TextDisplay:
-    """Displays terminal text according to the user's configuration."""
+    """Format and display terminal text using the user's settings."""
 
     ANSI_ESCAPE = re.compile(
         r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])"
     )
 
     def __init__(self, config: dict) -> None:
+        """Create a display that uses the provided configuration."""
         self.config = config
 
     def clear_terminal(self) -> None:
@@ -23,15 +24,19 @@ class TextDisplay:
             sys.stdout.flush()
 
     def title(self, text: str) -> str:
+        """Return text styled as a title."""
         return f"\x1B[1m{text}\x1B[0m\n"
 
     def path(self, text: str) -> str:
+        """Return text styled as a file-system path."""
         return f"\x1B[34m{text}\x1B[0m"
 
     def key(self, text: str) -> str:
+        """Return text styled as a menu key or response prompt."""
         return f"\x1B[36m{text}\x1B[0m"
 
     def error(self, text: str) -> str:
+        """Return text styled as an error message."""
         return f"\x1B[31m{text}\x1B[0m"
 
     def remove_formatting(self, text: str) -> str:
@@ -63,6 +68,7 @@ class ListMenu:
         options: dict[str, str],
         display: TextDisplay,
     ) -> None:
+        """Create a menu with a title, keyed options, and a display."""
         self.title = title
         self.options = options
         self.display = display

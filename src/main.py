@@ -16,6 +16,7 @@ import text_display
 
 
 def main() -> None:
+    """Parse command-line options and start the game."""
     parser = argparse.ArgumentParser(
         description="Micro Quest: A text-based adventure game engine."
     )
@@ -30,6 +31,7 @@ class Game:
     """Main game class."""
 
     def __init__(self) -> None:
+        """Initialize game state, configuration, and terminal display."""
         self.display = text_display.TextDisplay(config.Config.DEFAULT_DATA.copy())
         self.config = config.Config(self.display)
         self.config.load_config()
@@ -37,10 +39,12 @@ class Game:
         self.game_data: game_data.GameData = game_data.GameData(self.display)
 
     def await_input(self) -> None:
+        """Pause until the player presses Enter."""
         input("Press Enter to continue... ")
 
     def play_game(self) -> None:
-        data = self.game_data.data # Shorthand for easier access
+        """Display the loaded game's introduction and main choice menu."""
+        data = self.game_data.data
         if data is None:
             return
 
@@ -79,7 +83,7 @@ class Game:
                 return True
 
     def load_game(self, file_path: str) -> bool:
-        """Load a game, activating template files into a separate copy."""
+        """Load a game and make a playable copy when the file is a template."""
         if not self.game_data.load_game_file(file_path):
             self.await_input()
             return False
@@ -128,7 +132,7 @@ class Game:
             self.game_data.data["status"] = "template"
 
     def config_menu(self) -> None:
-        """Display the configuration menu."""
+        """Display settings and save each changed option."""
         settings = {
             "1": ("clear_terminal", "Toggle clear terminal"),
             "2": ("text_formatting", "Toggle text formatting"),
@@ -155,7 +159,7 @@ class Game:
             self.config.save_config()
 
     def load_last_save(self) -> None:
-        """Load the last save file if it exists."""
+        """Offer to resume the last saved game when its file exists."""
         last_save_file = self.config.data.get("last_save_file")
         if last_save_file and Path(last_save_file).exists():
             if self.load_game(last_save_file):
@@ -171,12 +175,12 @@ class Game:
             self.await_input()
 
     def store_last_save(self, file_path: str) -> None:
-        """Store the current game state to the last save file."""
+        """Record and persist the path of the current game file."""
         self.config.data["last_save_file"] = file_path
         self.config.save_config()
 
     def run(self, file_path: str | None = None) -> None:
-        """Run the game directly or display the main menu."""
+        """Start the specified game or run the main menu loop."""
         if file_path is not None:
             if self.load_game(file_path):
                 self.play_game()

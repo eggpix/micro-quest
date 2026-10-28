@@ -8,9 +8,10 @@ import text_display
 
 
 class GameData:
-    """Class to manage game data."""
+    """Load, update, and save the current game's data."""
 
     def __init__(self, display: text_display.TextDisplay | None = None) -> None:
+        """Initialize empty game data and an optional output display."""
         self.data: dict[str, Any] | None = None
         self.data_path: str | None = None
         self.display = display or text_display.TextDisplay(
@@ -18,7 +19,7 @@ class GameData:
         )
 
     def update_game_data(self, new_data: dict[str, Any]) -> bool:
-        """Update the current game data with new data."""
+        """Merge new values into the loaded game data."""
         if self.data is None:
             self.display.text(
                 self.display.error("Error: No game data loaded to update.")
@@ -29,7 +30,7 @@ class GameData:
         return True
 
     def load_game_file(self, file_path: str) -> bool:
-        """Load game data from a JSON file."""
+        """Load a JSON game file, returning whether it was valid and readable."""
         try:
             with open(file_path, "r", encoding="utf-8") as file:
                 new_data = json.load(file)
@@ -65,7 +66,7 @@ class GameData:
         return False
 
     def save_game_file(self) -> bool:
-        """Save the current game data to its loaded file."""
+        """Save game data to its currently loaded file."""
         if self.data is None or self.data_path is None:
             self.display.text(
                 self.display.error("Error: No game data loaded to save.")
@@ -83,7 +84,7 @@ class GameData:
             return False
 
     def copy_game_file(self, file_path: str) -> bool:
-        """Save the current game data as a new file without overwriting."""
+        """Create a new game file without overwriting an existing file."""
         if self.data is None:
             self.display.text(
                 self.display.error("Error: No game data loaded to save.")

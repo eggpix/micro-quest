@@ -50,7 +50,10 @@ class TextDisplay:
 
         if self.config["wrap_text"]:
             width = shutil.get_terminal_size().columns
-            text = textwrap.fill(text, width=width)
+            text = "\n".join(
+                textwrap.fill(line, width=width) if line else ""
+                for line in text.split("\n")
+            )
 
         return text
 

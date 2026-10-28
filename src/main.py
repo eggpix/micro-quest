@@ -8,7 +8,6 @@ can load these files into the Micro Quest engine to play through the adventure.
 """
 
 import argparse
-import os
 from pathlib import Path
 
 import config
@@ -68,7 +67,7 @@ class Game:
             if self.config["clear_terminal"]:
                 self.display.clear_terminal()
             print("Input the file path of your game to get started.")
-            print(self.display.format(f"Current working directory: \x1B[34m{os.getcwd()}\x1B[0m"))
+            print(self.display.format(f"Current working directory: \x1B[34m{Path.cwd()}\x1B[0m"))
             print("[0] Cancel")
             file_path = input("> ")
             if file_path == "0":
@@ -144,7 +143,7 @@ class Game:
     def load_last_save(self) -> None:
         """Load the last save file if it exists."""
         last_save_file = self.config.get("last_save_file")
-        if last_save_file and os.path.exists(last_save_file):
+        if last_save_file and Path(last_save_file).exists():
             if self.load_game(last_save_file):
                 if self.config["clear_terminal"]:
                     self.display.clear_terminal()

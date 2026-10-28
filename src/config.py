@@ -53,5 +53,8 @@ def load_config() -> dict:
 
 def save_config(data: dict) -> None:
     """Saves the given data to config.json file."""
-    with open(filename, "w", encoding="utf-8") as file:
-        json.dump(data, file, indent=4)
+    try:
+        with open(filename, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4)
+    except (OSError, TypeError, ValueError) as error:
+        print(f"Error: Could not save configuration to '{filename}': {error}")

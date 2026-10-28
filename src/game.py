@@ -19,7 +19,7 @@ class Game:
 
     def await_input(self) -> None:
         """Pause until the player presses Enter."""
-        input("Press Enter to continue... ")
+        input(f"{self.display.key('[Enter]')} to continue... ")
 
     def play_game(self) -> None:
         """Display the loaded game's introduction and main choice menu."""

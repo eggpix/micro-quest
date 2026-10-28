@@ -24,12 +24,12 @@
                             "entry_message": "Welcome, {player.name}! Enter the world of coding."
                         },
 
-                        "0,1": {
+                        "1,0": {
                             "entry_message": "A gate closed behind you.",
                             "blocked": ["left"]
                         },
 
-                        "0,2": {
+                        "2,0": {
                             "entry_message": [
                                 "There's a key on the ground.",
                                 "Try picking it up!"
@@ -37,7 +37,7 @@
                             "items": ["door_key_0"]
                         },
 
-                        "-1,2": {
+                        "2,-1": {
                             "connections": {
                                 "up": {
                                     "destination": "newcomer_zone:0,0",

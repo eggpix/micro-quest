@@ -6,6 +6,8 @@ import config
 import game_data
 import text_display
 
+MAP_SIZE = 7
+
 class Game:
     """Coordinate menus, game data, configuration, and play."""
 
@@ -21,11 +23,46 @@ class Game:
         """Pause until the player presses Enter."""
         input(f"{self.display.key('[Enter]')} to continue... ")
 
+    def get_player_region(self) -> dict:
+        data = self.game_data.data
+        subregions = data.get("player").get("location").split(":")[:-1]
+        sub = data.get("regions").get(subregions[0])
+        for s in range(1, len(subregions)):
+            sub = sub.get("subregions").get(subregions[s])
+        return sub
+
+    def get_region_string(self) -> str:
+        data = self.game_data.data
+        subregions = data.get("player").get("location").split(":")[:-1]
+        name_list = []
+        sub = data.get("regions").get(subregions[0])
+        for s in range(1, len(subregions)):
+            name_list.append(sub.get("name"))
+            sub = sub.get("subregions").get(subregions[s])
+        name_list.append(sub.get("name"))
+        return " / ".join(name_list)
+
+    def get_map(self) -> str:
+        data = self.game_data.data
+        player_pos = [
+            int(c) for c in
+            data.get("player").get("location").split(":")[-1].split(",")
+        ]
+        map_str = ""
+        for y in range(player_pos[1] - MAP_SIZE // 2, player_pos[1] + MAP_SIZE // 2 + 1):
+            for x in range(player_pos[0] - MAP_SIZE // 2, player_pos[1] + MAP_SIZE // 2 + 1):
+                if [x,y] == player_pos:
+                    map_str += "[x]"
+                elif self.get_player_region().get("rooms").get(f"{x},{y}"):
+                    map_str += "[ ]"
+                else:
+                    map_str += self.display.grid(" . ")
+            map_str += "\n"
+        return map_str
+
     def play_game(self) -> None:
         """Display the loaded game's introduction and main choice menu."""
         data = self.game_data.data
-        if data is None:
-            return
 
         self.display.clear_terminal()
         self.display.text(self.display.title(data.get("title") or "Untitled"))
@@ -35,6 +72,7 @@ class Game:
         while True:
             self.display.clear_terminal()
             room_options = {
+                "1": "View Location",
                 "0": "Save and Exit",
             }
             room_menu = text_display.ListMenu(
@@ -42,6 +80,14 @@ class Game:
             )
             selection = room_menu.get_input()
             match selection:
+                case "1":
+                    self.display.clear_terminal()
+                    self.display.text(f"Current Region: {self.display.title(self.get_region_string())}")
+                    self.display.text(f"Current Room: {
+                        self.display.title(f"[{data.get("player").get("location").split(":")[-1]}]")
+                    }")
+                    self.display.text(f"{self.get_map()}")
+                    self.await_input()
                 case "0":
                     self.game_data.save_game_file()
                     return

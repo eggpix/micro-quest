@@ -39,6 +39,10 @@ class TextDisplay:
         """Return text styled as an error message."""
         return f"\x1B[31m{text}\x1B[0m"
 
+    def grid(self, text: str) -> str:
+        """Return text styled as dim background grid for maps."""
+        return f"\x1B[2m{text}\x1B[0m"
+
     def remove_formatting(self, text: str) -> str:
         """Remove ANSI escape sequences from text."""
         return self.ANSI_ESCAPE.sub("", text)
@@ -52,7 +56,7 @@ class TextDisplay:
             width = shutil.get_terminal_size().columns
             text = "\n".join(
                 textwrap.fill(line, width=width) if line else ""
-                for line in text.split("\n")
+                for line in text.splitlines()
             )
 
         return text

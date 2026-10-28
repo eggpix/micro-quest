@@ -88,14 +88,14 @@ class Game:
             return False
 
         if data.get("status") == "template":
-            if not self.create_active_copy(file_path):
+            if not self.copy_template(file_path):
                 return False
             file_path = self.game_data.data_path or file_path
 
         self.save_last_save(file_path)
         return True
 
-    def create_active_copy(self, template_path: str) -> bool:
+    def copy_template(self, template_path: str) -> bool:
         """Prompt for and create a new active copy of the loaded template."""
         source = Path(template_path)
         default_path = source.with_name(f"{source.stem}_copy{source.suffix or '.json'}")

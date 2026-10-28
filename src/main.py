@@ -39,7 +39,7 @@ class Game:
         input("Press Enter to continue... ")
 
     def play_game(self) -> None:
-        data = self.game_data.data
+        data = self.game_data.data # Shorthand for easier access
         if data is None:
             return
 
@@ -92,7 +92,7 @@ class Game:
                 return False
             file_path = self.game_data.data_path or file_path
 
-        self.save_last_save(file_path)
+        self.store_last_save(file_path)
         return True
 
     def copy_template(self, template_path: str) -> bool:
@@ -166,8 +166,8 @@ class Game:
             self.display.text("No last save file found.")
             self.await_input()
 
-    def save_last_save(self, file_path: str) -> None:
-        """Save the current game state to the last save file."""
+    def store_last_save(self, file_path: str) -> None:
+        """Store the current game state to the last save file."""
         self.config["last_save_file"] = file_path
         config.save_config(self.config, self.display)
 

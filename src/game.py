@@ -60,6 +60,40 @@ class Game:
             map_str += "\n"
         return map_str
 
+    def player_move(self):
+        data = self.game_data.data
+        player_pos = [
+            int(c) for c in
+            data.get("player").get("location").split(":")[-1].split(",")
+        ]
+        available = []
+        self.display.clear_terminal()
+        direction_menu = text_display.ListMenu(
+            f"Available Directions: {", ".join(available)}\nChoose a Direction to Move:",
+            {
+                "W": "Up",
+                "A": "Left",
+                "S": "Down",
+                "D": "Right",
+                "0": "Cancel"
+            },
+            self.display
+        )
+        dir_selection = direction_menu.get_input()
+
+        match dir_selection:
+            case "w":
+                player_pos[1] -= 1
+            case "a":
+                player_pos[0] -= 1
+            case "s":
+                player_pos[1] += 1
+            case "d":
+                player_pos[0] += 1
+        location_components = data.get("player").get("location").split(":")
+        new_location_string = ":".join(location_components[:-1] + [f"{player_pos[0]},{player_pos[1]}"])
+        data["player"]["location"] = new_location_string
+            
     def play_game(self) -> None:
         """Display the loaded game's introduction and main choice menu."""
         data = self.game_data.data
@@ -72,7 +106,8 @@ class Game:
         while True:
             self.display.clear_terminal()
             room_options = {
-                "1": "View Location",
+                "1": "Move",
+                "2": "View Location",
                 "0": "Save and Exit",
             }
             room_menu = text_display.ListMenu(
@@ -81,6 +116,8 @@ class Game:
             selection = room_menu.get_input()
             match selection:
                 case "1":
+                    self.player_move()
+                case "2":
                     self.display.clear_terminal()
                     self.display.text(f"Current Region: {self.display.title(self.get_region_string())}")
                     self.display.text(f"Current Room: {
@@ -192,7 +229,7 @@ class Game:
                 self.display.text(
                     f"Load game {self.display.path(last_save_file)}?"
                 )
-                self.display.text(self.display.key("[y/n]"))
+                self.display.text(self.display.key("[Y/N]"))
                 if input("> ").strip().lower() in ("y", "yes"):
                     self.play_game()
         else:

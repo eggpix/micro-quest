@@ -95,5 +95,5 @@ class ListMenu:
             self.show()
             selection = input("> ").lower().strip()
 
-            if selection in self.options:
+            if selection in [option.lower() for option in self.options]:
                 return selection

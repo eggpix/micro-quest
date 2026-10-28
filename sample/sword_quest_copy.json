@@ -4,7 +4,7 @@
     "status": "active",
     "player": {
         "name": "",
-        "location": "python_plains:gate_entry:0,0",
+        "location": "python_plains:gate_entry:0,1",
         "inventory": []
     },
     "regions": {

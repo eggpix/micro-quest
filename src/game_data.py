@@ -18,17 +18,6 @@ class GameData:
             {"text_formatting": True, "wrap_text": False}
         )
 
-    def update_game_data(self, new_data: dict[str, Any]) -> bool:
-        """Merge new values into the loaded game data."""
-        if self.data is None:
-            self.display.text(
-                self.display.error("Error: No game data loaded to update.")
-            )
-            return False
-
-        self.data.update(new_data)
-        return True
-
     def load_game_file(self, file_path: str) -> bool:
         """Load a JSON game file, returning whether it was valid and readable."""
         try:

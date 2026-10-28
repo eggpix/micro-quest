@@ -122,7 +122,7 @@ class Game:
                 continue
 
             self.game_data.data["status"] = "active"
-            if self.game_data.save_game_file_as(destination):
+            if self.game_data.copy_game_file(destination):
                 return True
             self.game_data.data["status"] = "template"
 

@@ -82,7 +82,7 @@ class GameData:
             )
             return False
 
-    def save_game_file_as(self, file_path: str) -> bool:
+    def copy_game_file(self, file_path: str) -> bool:
         """Save the current game data as a new file without overwriting."""
         if self.data is None:
             self.display.text(

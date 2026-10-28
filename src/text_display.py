@@ -2,6 +2,7 @@
 
 import re
 import shutil
+import sys
 import textwrap
 
 
@@ -17,7 +18,19 @@ class TextDisplay:
 
     def clear_terminal(self) -> None:
         """Clear the visible terminal screen."""
-        print("\x1B[2J\x1B[H", end="")
+        sys.stdout.write("\x1B[2J\x1B[H")
+
+    def title(self, text: str) -> str:
+        return f"\x1B[1m{text}\x1B[0m\n"
+
+    def path(self, text: str) -> str:
+        return f"\x1B[34m{text}\x1B[0m"
+
+    def key(self, text: str) -> str:
+        return f"\x1B[36m{text}\x1B[0m"
+
+    def error(self, text: str) -> str:
+        return f"\x1B[31m{text}\x1B[0m"
 
     def remove_formatting(self, text: str) -> str:
         """Remove ANSI escape sequences from text."""
@@ -34,29 +47,9 @@ class TextDisplay:
 
         return text
 
-    def display_title(self, title: str, clear: bool | None = None) -> None:
-        """Display a title, optionally clearing the terminal."""
-        if clear is None:
-            clear = self.config["clear_terminal"]
-        if clear:
-            self.clear_terminal()
-
-        if self.config["text_formatting"]:
-            title = f"\x1B[33m{title}\x1B[0m"
-
-        print(title)
-
-    def display_dialogue(
-        self, text: str, clear: bool | None = None
-    ) -> None:
-        """Display dialogue according to the user's settings."""
-        if clear is None:
-            clear = self.config["clear_terminal"]
-        if clear:
-            self.clear_terminal()
-
-        text = self.format(text)
-        print(text)
+    def text(self, text: str) -> None:
+        """Display formatted text according to configuration."""
+        print(self.format(text))
 
 
 class ListMenu:
@@ -74,10 +67,10 @@ class ListMenu:
 
     def show(self) -> None:
         """Display the menu, optionally clearing the terminal."""
-        self.display.display_title(self.title)
+        self.display.text(self.display.title(self.title))
 
         for key, option in self.options.items():
-            print(f"[{key}] {option}")
+            self.display.text(f"{self.display.key(f'[{key}]')} {option}")
 
     def get_input(self) -> str:
         """Display the menu until the user enters a valid selection."""

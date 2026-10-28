@@ -2,6 +2,8 @@
 
 import json
 
+import text_display
+
 filename = "config.json"
 default_data = {
     "clear_terminal": True,
@@ -12,8 +14,11 @@ default_data = {
 }
 
 
-def load_config() -> dict:
+def load_config(display: text_display.TextDisplay | None = None) -> dict:
     """Loads config.json file and returns its contents as a dictionary."""
+    display = display or text_display.TextDisplay(
+        {"text_formatting": True, "wrap_text": False}
+    )
     create_config = False
     try:
         with open(filename, "r", encoding="utf-8") as file:
@@ -22,16 +27,26 @@ def load_config() -> dict:
         data = {}
         create_config = True
     except json.JSONDecodeError as error:
-        print(f"Error: Invalid JSON in '{filename}': {error}. Using defaults.")
+        display.text(
+            display.error(
+                f"Error: Invalid JSON in '{filename}': {error}. Using defaults."
+            )
+        )
         data = {}
     except OSError as error:
-        print(f"Error: Could not read '{filename}': {error}. Using defaults.")
+        display.text(
+            display.error(
+                f"Error: Could not read '{filename}': {error}. Using defaults."
+            )
+        )
         data = {}
 
     if not isinstance(data, dict):
-        print(
-            f"Error: Configuration in '{filename}' must be a JSON object. "
-            "Using defaults."
+        display.text(
+            display.error(
+                f"Error: Configuration in '{filename}' must be a JSON object. "
+                "Using defaults."
+            )
         )
         data = {}
 
@@ -39,22 +54,33 @@ def load_config() -> dict:
     config_data.update(data)
     for key, default_value in default_data.items():
         if type(config_data[key]) is not type(default_value):
-            print(
-                f"Error: Invalid value for '{key}' in '{filename}'. "
-                "Using the default."
+            display.text(
+                display.error(
+                    f"Error: Invalid value for '{key}' in '{filename}'. "
+                    "Using the default."
+                )
             )
             config_data[key] = default_value
 
     if create_config:
-        save_config(config_data)
+        save_config(config_data, display)
 
     return config_data
 
 
-def save_config(data: dict) -> None:
+def save_config(
+    data: dict, display: text_display.TextDisplay | None = None
+) -> None:
     """Saves the given data to config.json file."""
+    display = display or text_display.TextDisplay(
+        {"text_formatting": True, "wrap_text": False}
+    )
     try:
         with open(filename, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
     except (OSError, TypeError, ValueError) as error:
-        print(f"Error: Could not save configuration to '{filename}': {error}")
+        display.text(
+            display.error(
+                f"Error: Could not save configuration to '{filename}': {error}"
+            )
+        )

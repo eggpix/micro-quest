@@ -30,9 +30,10 @@ class Game:
     """Main game class."""
 
     def __init__(self) -> None:
-        self.game_data: game_data.GameData = game_data.GameData()
-        self.config = config.load_config()
-        self.display = text_display.TextDisplay(self.config)
+        self.display = text_display.TextDisplay(config.default_data.copy())
+        self.config = config.load_config(self.display)
+        self.display.config = self.config
+        self.game_data: game_data.GameData = game_data.GameData(self.display)
 
     def await_input(self) -> None:
         input("Press Enter to continue... ")
@@ -42,8 +43,10 @@ class Game:
         if data is None:
             return
 
-        self.display.display_title(data.get("title") or "Untitled")
-        self.display.display_dialogue(data.get("description") or "", clear=False)
+        if self.config["clear_terminal"]:
+            self.display.clear_terminal()
+        self.display.text(self.display.title(data.get("title") or "Untitled"))
+        self.display.text(data.get("description") or "")
         self.await_input()
 
         while True:
@@ -66,9 +69,11 @@ class Game:
         while True:
             if self.config["clear_terminal"]:
                 self.display.clear_terminal()
-            print("Input the file path of your game to get started.")
-            print(self.display.format(f"Current working directory: \x1B[34m{Path.cwd()}\x1B[0m"))
-            print("[0] Cancel")
+            self.display.text("Input the file path of your game to get started.")
+            self.display.text(
+                f"Current working directory: {self.display.path(str(Path.cwd()))}"
+            )
+            self.display.text(f"{self.display.key('[0]')} Cancel")
             file_path = input("> ")
             if file_path == "0":
                 return False
@@ -100,15 +105,24 @@ class Game:
         while True:
             if self.config["clear_terminal"]:
                 self.display.clear_terminal()
-            print(f"This game file is a template. To play, you must create a new copy to store your progress.")
-            print(self.display.format(f"Enter a file path to create a new copy (default: \x1B[34m{default_path}\x1B[0m)."))
-            print("[0] Cancel")
+            self.display.text(
+                "This game file is a template. To play, you must create a new "
+                "copy to store your progress."
+            )
+            self.display.text(
+                "Enter a file path to create a new copy "
+                f"(default: {self.display.path(str(default_path))})."
+            )
+            self.display.text(f"{self.display.key('[0]')} Cancel")
             destination = input("> ").strip()
             if destination == "0":
                 return False
             destination = destination or str(default_path)
             if Path(destination).exists():
-                print(self.display.format(f"A file already exists at '\x1B[34m{destination}\x1B[0m'. Choose another path."))
+                self.display.text(
+                    "A file already exists at "
+                    f"'{self.display.path(destination)}'. Choose another path."
+                )
                 continue
 
             self.game_data.data["status"] = "active"
@@ -138,7 +152,7 @@ class Game:
             name, _ = settings[selection]
             self.config[name] = not self.config[name]
 
-            config.save_config(self.config)
+            config.save_config(self.config, self.display)
 
     def load_last_save(self) -> None:
         """Load the last save file if it exists."""
@@ -147,18 +161,20 @@ class Game:
             if self.load_game(last_save_file):
                 if self.config["clear_terminal"]:
                     self.display.clear_terminal()
-                print(self.display.format(f"Load game \x1B[34m{last_save_file}\x1B[0m?"))
-                print("[y/n]")
+                self.display.text(
+                    f"Load game {self.display.path(last_save_file)}?"
+                )
+                self.display.text(self.display.key("[y/n]"))
                 if input("> ").strip().lower() in ("y", "yes"):
                     self.play_game()
         else:
-            print("No last save file found.")
+            self.display.text("No last save file found.")
             self.await_input()
 
     def save_last_save(self, file_path: str) -> None:
         """Save the current game state to the last save file."""
         self.config["last_save_file"] = file_path
-        config.save_config(self.config)
+        config.save_config(self.config, self.display)
 
     def run(self, file_path: str | None = None) -> None:
         """Run the game directly or display the main menu."""

@@ -18,7 +18,9 @@ class TextDisplay:
 
     def clear_terminal(self) -> None:
         """Clear the visible terminal screen."""
-        sys.stdout.write("\x1B[2J\x1B[H")
+        if self.config["clear_terminal"]:
+            sys.stdout.write("\x1B[2J\x1B[H")
+            sys.stdout.flush()
 
     def title(self, text: str) -> str:
         return f"\x1B[1m{text}\x1B[0m\n"
@@ -67,6 +69,8 @@ class ListMenu:
 
     def show(self) -> None:
         """Display the menu, optionally clearing the terminal."""
+        self.display.clear_terminal()
+
         self.display.text(self.display.title(self.title))
 
         for key, option in self.options.items():

@@ -43,15 +43,13 @@ class Game:
         if data is None:
             return
 
-        if self.config["clear_terminal"]:
-            self.display.clear_terminal()
+        self.display.clear_terminal()
         self.display.text(self.display.title(data.get("title") or "Untitled"))
         self.display.text(data.get("description") or "")
         self.await_input()
 
         while True:
-            if self.config["clear_terminal"]:
-                self.display.clear_terminal()
+            self.display.clear_terminal()
             room_options = {
                 "0": "Save and Exit",
             }
@@ -67,8 +65,7 @@ class Game:
     def get_game_file(self) -> bool:
         """Prompt until a game file loads successfully or the user cancels."""
         while True:
-            if self.config["clear_terminal"]:
-                self.display.clear_terminal()
+            self.display.clear_terminal()
             self.display.text("Input the file path of your game to get started.")
             self.display.text(
                 f"Current working directory: {self.display.path(str(Path.cwd()))}"
@@ -103,8 +100,7 @@ class Game:
         source = Path(template_path)
         default_path = source.with_name(f"{source.stem}_copy{source.suffix or '.json'}")
         while True:
-            if self.config["clear_terminal"]:
-                self.display.clear_terminal()
+            self.display.clear_terminal()
             self.display.text(
                 "This game file is a template. To play, you must create a new "
                 "copy to store your progress."
@@ -159,8 +155,7 @@ class Game:
         last_save_file = self.config.get("last_save_file")
         if last_save_file and Path(last_save_file).exists():
             if self.load_game(last_save_file):
-                if self.config["clear_terminal"]:
-                    self.display.clear_terminal()
+                self.display.clear_terminal()
                 self.display.text(
                     f"Load game {self.display.path(last_save_file)}?"
                 )

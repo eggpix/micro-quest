@@ -5,8 +5,10 @@
     "player": {
         "name": "",
         "region": "python_plains:gate_entry",
-        "room_x": 0,
-        "room_y": -1,
+        "room_position": [
+            0,
+            0
+        ],
         "inventory": []
     },
     "regions": {

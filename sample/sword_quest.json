@@ -1,44 +1,38 @@
-
 {
     "title": "Sword Quest",
     "description": "Welcome to a world made of code where each kingdom speaks a different programming language. Combine your programming knowledge with the wisdom of locals to reach the center of the world and claim the Sword of Programming.",
-
-    "status": "template",
-
+    "status": "active",
     "player": {
-        "name": "", 
+        "name": "",
         "region": "python_plains:gate_entry",
-        "room_x": 0,
-        "room_y": 0,
+        "room_position": [0,0],
         "inventory": []
     },
-
     "regions": {
         "python_plains": {
             "name": "Python Plains",
-
             "subregions": {
                 "gate_entry": {
                     "name": "Gate Entry",
-
                     "rooms": {
                         "0,0": {
                             "entry_message": "Welcome, {player.name}! Enter the world of coding."
                         },
-
                         "1,0": {
                             "entry_message": "A gate closed behind you.",
-                            "blocked": ["left"]
+                            "blocked": [
+                                "left"
+                            ]
                         },
-
                         "2,0": {
                             "entry_message": [
                                 "There's a key on the ground.",
                                 "Try picking it up!"
                             ],
-                            "items": ["door_key_0"]
+                            "items": [
+                                "door_key_0"
+                            ]
                         },
-
                         "2,-1": {
                             "connections": {
                                 "up": {
@@ -49,10 +43,8 @@
                         }
                     }
                 },
-
                 "newcomer_zone": {
                     "name": "Newcomer Zone",
-
                     "rooms": {
                         "0,0": {}
                     }
@@ -60,22 +52,23 @@
             }
         }
     },
-
     "items": {
         "door_key_0": {
             "name": "Door Key",
             "acquire_message": "\"I picked up a key! What could this unlock?\""
         }
     },
-
     "challenges": {
         "door_lock_0": {
             "type": "code",
             "prompt": [
                 "A door blocks your path.",
                 "Here's your first chance to demonstrate your coding knowledge!",
-                "Try entering Door.use_key(door_key)."],
-            "required_items": ["door_key_0"],
+                "Try entering Door.use_key(door_key)."
+            ],
+            "required_items": [
+                "door_key_0"
+            ],
             "solution": "Door.use_key(door_key)",
             "success_message": "The door unlocks!",
             "failure_message": "Hmmm... that code didn't work. Try again."

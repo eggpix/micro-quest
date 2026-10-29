@@ -45,9 +45,15 @@ class Game:
     def get_map(self) -> str:
         player_data = self.game_data.data.get("player")
         map_str = ""
-        for y in range(player_data.get("room_x") - MAP_SIZE // 2, player_data.get("room_y") + MAP_SIZE // 2 + 1):
-            for x in range(player_data.get("room_x") - MAP_SIZE // 2, player_data.get("room_y") + MAP_SIZE // 2 + 1):
-                if [x,y] == [player_data.get("room_x"), player_data.get("room_y")]:
+        for y in range(
+            player_data.get("room_position")[0] - MAP_SIZE // 2,
+            player_data.get("room_position")[1] + MAP_SIZE // 2 + 1
+        ):
+            for x in range(
+                player_data.get("room_position")[0] - MAP_SIZE // 2,
+                player_data.get("room_position")[1] + MAP_SIZE // 2 + 1
+            ):
+                if [x,y] == player_data.get("room_position"):
                     map_str += "[x]"
                 elif self.get_player_region().get("rooms").get(f"{x},{y}"):
                     map_str += "[ ]"
@@ -75,13 +81,13 @@ class Game:
 
         match dir_selection:
             case "w":
-                player_data["room_y"] -= 1
+                player_data["room_position"][1] -= 1
             case "a":
-                player_data["room_x"] -= 1
+                player_data["room_position"][0] -= 1
             case "s":
-                player_data["room_y"] += 1
+                player_data["room_position"][1] += 1
             case "d":
-                player_data["room_x"] += 1
+                player_data["room_position"][0] += 1
             
     def play_game(self) -> None:
         """Display the loaded game's introduction and main choice menu."""
@@ -107,9 +113,11 @@ class Game:
                 case "1":
                     self.player_move()
                 case "2":
+                    px = data.get("player").get("room_position")[0] # Player room x
+                    py = data.get("player").get("room_position")[1] # Player room y
                     self.display.clear_terminal()
                     self.display.text(f"Current Region: {self.display.title(self.get_region_string())}")
-                    self.display.text(f"Current Room: [{data.get("player").get("room_x")}, {data.get("player").get("room_y")}]")
+                    self.display.text(f"Current Room: [{px},{py}]")
                     self.display.text(f"{self.get_map()}")
                     self.await_input()
                 case "0":

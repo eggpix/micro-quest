@@ -25,15 +25,15 @@ class Game:
 
     def get_player_region(self) -> dict:
         data = self.game_data.data
-        subregions = data.get("player").get("location").split(":")[:-1]
+        subregions = data.get("player").get("region").split(":")
         sub = data.get("regions").get(subregions[0])
         for s in range(1, len(subregions)):
             sub = sub.get("subregions").get(subregions[s])
-        return sub
+        return sub     
 
     def get_region_string(self) -> str:
         data = self.game_data.data
-        subregions = data.get("player").get("location").split(":")[:-1]
+        subregions = data.get("player").get("region").split(":")
         name_list = []
         sub = data.get("regions").get(subregions[0])
         for s in range(1, len(subregions)):
@@ -43,15 +43,11 @@ class Game:
         return " / ".join(name_list)
 
     def get_map(self) -> str:
-        data = self.game_data.data
-        player_pos = [
-            int(c) for c in
-            data.get("player").get("location").split(":")[-1].split(",")
-        ]
+        player_data = self.game_data.data.get("player")
         map_str = ""
-        for y in range(player_pos[1] - MAP_SIZE // 2, player_pos[1] + MAP_SIZE // 2 + 1):
-            for x in range(player_pos[0] - MAP_SIZE // 2, player_pos[1] + MAP_SIZE // 2 + 1):
-                if [x,y] == player_pos:
+        for y in range(player_data.get("room_x") - MAP_SIZE // 2, player_data.get("room_y") + MAP_SIZE // 2 + 1):
+            for x in range(player_data.get("room_x") - MAP_SIZE // 2, player_data.get("room_y") + MAP_SIZE // 2 + 1):
+                if [x,y] == [player_data.get("room_x"), player_data.get("room_y")]:
                     map_str += "[x]"
                 elif self.get_player_region().get("rooms").get(f"{x},{y}"):
                     map_str += "[ ]"
@@ -61,11 +57,7 @@ class Game:
         return map_str
 
     def player_move(self):
-        data = self.game_data.data
-        player_pos = [
-            int(c) for c in
-            data.get("player").get("location").split(":")[-1].split(",")
-        ]
+        player_data = self.game_data.data.get("player")
         available = []
         self.display.clear_terminal()
         direction_menu = text_display.ListMenu(
@@ -83,16 +75,13 @@ class Game:
 
         match dir_selection:
             case "w":
-                player_pos[1] -= 1
+                player_data["room_y"] -= 1
             case "a":
-                player_pos[0] -= 1
+                player_data["room_x"] -= 1
             case "s":
-                player_pos[1] += 1
+                player_data["room_y"] += 1
             case "d":
-                player_pos[0] += 1
-        location_components = data.get("player").get("location").split(":")
-        new_location_string = ":".join(location_components[:-1] + [f"{player_pos[0]},{player_pos[1]}"])
-        data["player"]["location"] = new_location_string
+                player_data["room_x"] += 1
             
     def play_game(self) -> None:
         """Display the loaded game's introduction and main choice menu."""
@@ -120,9 +109,7 @@ class Game:
                 case "2":
                     self.display.clear_terminal()
                     self.display.text(f"Current Region: {self.display.title(self.get_region_string())}")
-                    self.display.text(f"Current Room: {
-                        self.display.title(f"[{data.get("player").get("location").split(":")[-1]}]")
-                    }")
+                    self.display.text(f"Current Room: [{data.get("player").get("room_x")}, {data.get("player").get("room_y")}]")
                     self.display.text(f"{self.get_map()}")
                     self.await_input()
                 case "0":

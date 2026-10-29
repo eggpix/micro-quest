@@ -6,8 +6,10 @@
     "status": "template",
 
     "player": {
-        "name": "",
-        "location": "python_plains:gate_entry:0,0",
+        "name": "", 
+        "region": "python_plains:gate_entry",
+        "room_x": 0,
+        "room_y": 0,
         "inventory": []
     },
 

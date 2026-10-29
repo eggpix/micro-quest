@@ -4,7 +4,9 @@
     "status": "active",
     "player": {
         "name": "",
-        "location": "python_plains:gate_entry:0,1",
+        "region": "python_plains:gate_entry",
+        "room_x": 0,
+        "room_y": -1,
         "inventory": []
     },
     "regions": {

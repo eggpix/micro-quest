@@ -1,0 +1,33 @@
+{
+    "title": "Castle Game",
+    "description": "A game about castles.",
+    "status": "active",
+    "player": {
+        "name": "Jane",
+        "region": "fountain",
+        "room_position": [0,0],
+        "inventory": {
+            "cake": 1
+        }
+    },
+    "regions": {
+        "fountain": {
+            "name": "Castle Fountain",
+            "rooms": {
+                "0,0": {},
+                "0,-1": {
+                    "block": ["right"]
+                },
+                "1,0": {
+                    "block": ["up"]
+                },
+                "1,-1": {
+                    "block": ["down", "left"]
+                },
+                "2,0": {},
+                "2,-1": {},
+                "2,-2": {}
+            }
+        }
+    }
+}

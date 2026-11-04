@@ -1,4 +1,4 @@
-# micro-quest
+# micro-quest **(WORK IN PROGRESS)**
 Micro Quest is a text-based adventure game engine allowing users to create and
 play their own text-based adventure stories.
 

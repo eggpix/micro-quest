@@ -160,3 +160,20 @@ Each room is stored as a square in a grid of rooms. It's displayed this way when
 ```
 
 Adding the `"block"` member to a room restricts the player from moving in that direction. Note that blocks do not apply in both directions; to block a player from moving back, you must add a second block in the opposite direction to the adjacent room.
+
+Let's add a message to one of the rooms. This message will play when the player enters the room. To make the message only play once, we can add the `"repeat"` and `"played"` members.
+
+```json
+    "0,0": {
+        "message": {
+            "text": [
+                "Welcome to Castle Game, {player.name}! We hope you enjoy your stay.",
+                "Explore the castle and see what you find!"
+            ],
+            "repeat": false,
+            "played": false
+        }
+    }
+```
+
+`"repeat": false` means that the message cannot repeat. `"played"` store whether it has.

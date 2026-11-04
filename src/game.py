@@ -94,7 +94,7 @@ class Game:
         room_dialogue = room_data.get("message", {}).get("text")
 
         repeat_dialogue = room_data.get("message", {}).get("repeat")
-        played_dialogue = room_data.get("message", {}).get("replayed")
+        played_dialogue = room_data.get("message", {}).get("played")
 
         if room_dialogue and (repeat_dialogue or (not repeat_dialogue and not played_dialogue)):
             self.loop_dialogue(room_dialogue)
@@ -148,6 +148,8 @@ class Game:
         self.display.text(self.display.title(data.get("title") or "Untitled"))
         self.display.text(data.get("description") or "")
         self.await_input()
+
+        self.enter_room()
 
         while True:
             self.display.clear_terminal()

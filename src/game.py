@@ -107,10 +107,12 @@ class Game:
 
         while True:
             self.display.clear_terminal()
+            player_has_inventory = bool(data.get("player").get("inventory"))
             room_options = {
                 "1": "Move",
                 "2": "View Location",
-                "0": "Save and Exit",
+                **({"3": "View Inventory"} if player_has_inventory else {}),
+                "0": "Save and Exit"
             }
             room_menu = text_display.ListMenu(
                 "Choose an option:", room_options, self.display
@@ -126,6 +128,13 @@ class Game:
                     self.display.text(f"Current Region: {self.display.title(self.get_region_string())}")
                     self.display.text(f"Current Room: [{px},{py}]")
                     self.display.text(f"{self.get_map()}")
+                    self.await_input()
+                case "3" if player_has_inventory:
+                    self.display.clear_terminal()
+                    self.display.text("Inventory:")
+                    for item, quantity in data.get("player").get("inventory").items():
+                        entity_name = data.get("entities", {}).get(item, {}).get("name") or item
+                        self.display.text(f"{quantity}x {entity_name}")
                     self.await_input()
                 case "0":
                     self.game_data.save_game_file()

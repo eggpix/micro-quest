@@ -6,6 +6,7 @@ import config
 import game_data
 import text_display
 
+# MAP SIZE centered on player position, must be an odd number
 MAP_SIZE = 7
 
 class Game:
@@ -25,69 +26,75 @@ class Game:
 
     def get_player_region(self) -> dict:
         data = self.game_data.data
-        subregions = data.get("player").get("region").split(":")
-        sub = data.get("regions").get(subregions[0])
-        for s in range(1, len(subregions)):
-            sub = sub.get("subregions").get(subregions[s])
-        return sub     
+        region = data.get("player").get("region")
+        return data.get("regions").get(region)
 
     def get_region_string(self) -> str:
-        data = self.game_data.data
-        subregions = data.get("player").get("region").split(":")
-        name_list = []
-        sub = data.get("regions").get(subregions[0])
-        for s in range(1, len(subregions)):
-            name_list.append(sub.get("name"))
-            sub = sub.get("subregions").get(subregions[s])
-        name_list.append(sub.get("name"))
-        return " / ".join(name_list)
+        return self.get_player_region().get("name") or self.game_data.data.get("player").get("region")
 
     def get_map(self) -> str:
         player_data = self.game_data.data.get("player")
+        room_position = player_data["room_position"]
+        rooms = self.get_player_region()["rooms"]
+
         map_str = ""
+
         for y in range(
-            player_data.get("room_position")[0] - MAP_SIZE // 2,
-            player_data.get("room_position")[1] + MAP_SIZE // 2 + 1
+            room_position[1] - MAP_SIZE // 2,
+            room_position[1] + MAP_SIZE // 2 + 1
         ):
             for x in range(
-                player_data.get("room_position")[0] - MAP_SIZE // 2,
-                player_data.get("room_position")[1] + MAP_SIZE // 2 + 1
+                room_position[0] - MAP_SIZE // 2,
+                room_position[0] + MAP_SIZE // 2 + 1
             ):
-                if [x,y] == player_data.get("room_position"):
+                if [x, y] == room_position:
                     map_str += "[x]"
-                elif self.get_player_region().get("rooms").get(f"{x},{y}"):
+                elif f"{x},{y}" in rooms:
                     map_str += "[ ]"
                 else:
                     map_str += self.display.grid(" . ")
+
             map_str += "\n"
+
         return map_str
 
     def player_move(self):
         player_data = self.game_data.data.get("player")
-        available = []
+        room_position = player_data["room_position"]
+        rooms = self.get_player_region()["rooms"]
+
+        directions = {
+            "W": ("Up", (0, -1)),
+            "A": ("Left", (-1, 0)),
+            "S": ("Down", (0, 1)),
+            "D": ("Right", (1, 0))
+        }
+
+        direction_options = {"0": "Cancel"}
+
+        for key, (label, offset) in directions.items():
+            x = room_position[0] + offset[0]
+            y = room_position[1] + offset[1]
+
+            current_room = rooms.get(f"{room_position[0]},{room_position[1]}", {})
+            blocked_directions = current_room.get("block", [])
+
+            if f"{x},{y}" in rooms and label.lower() not in blocked_directions:
+                direction_options[key] = label
+
         self.display.clear_terminal()
+
         direction_menu = text_display.ListMenu(
-            f"Available Directions: {", ".join(available)}\nChoose a Direction to Move:",
-            {
-                "W": "Up",
-                "A": "Left",
-                "S": "Down",
-                "D": "Right",
-                "0": "Cancel"
-            },
+            "Choose a Direction to Move:",
+            direction_options,
             self.display
         )
-        dir_selection = direction_menu.get_input()
 
-        match dir_selection:
-            case "w":
-                player_data["room_position"][1] -= 1
-            case "a":
-                player_data["room_position"][0] -= 1
-            case "s":
-                player_data["room_position"][1] += 1
-            case "d":
-                player_data["room_position"][0] += 1
+        dir_selection = direction_menu.get_input().upper()
+        if dir_selection in directions:
+            offset = directions[dir_selection][1]
+            room_position[0] += offset[0]
+            room_position[1] += offset[1]
             
     def play_game(self) -> None:
         """Display the loaded game's introduction and main choice menu."""

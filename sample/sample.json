@@ -5,7 +5,10 @@
     "player": {
         "name": "Jane",
         "region": "fountain",
-        "room_position": [0,0],
+        "room_position": [
+            1,
+            0
+        ],
         "inventory": {
             "cake": 1
         }
@@ -16,13 +19,20 @@
             "rooms": {
                 "0,0": {},
                 "0,-1": {
-                    "block": ["right"]
+                    "block": [
+                        "right"
+                    ]
                 },
                 "1,0": {
-                    "block": ["up"]
+                    "block": [
+                        "up"
+                    ]
                 },
                 "1,-1": {
-                    "block": ["down", "left"]
+                    "block": [
+                        "down",
+                        "left"
+                    ]
                 },
                 "2,0": {},
                 "2,-1": {},

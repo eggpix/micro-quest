@@ -6,7 +6,7 @@
         "name": "Jane",
         "region": "fountain",
         "room_position": [
-            1,
+            0,
             0
         ],
         "inventory": {
@@ -17,7 +17,14 @@
         "fountain": {
             "name": "Castle Fountain",
             "rooms": {
-                "0,0": {},
+                "0,0": {
+                    "message": {
+                        "text": [
+                            "Welcome to Castle Game, {player.name}! We hope you enjoy your stay.",
+                            "Explore the castle and see what you find!"
+                        ]
+                    }
+                },
                 "0,-1": {
                     "block": [
                         "right"

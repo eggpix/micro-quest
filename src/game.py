@@ -5,6 +5,7 @@ from pathlib import Path
 import config
 import game_data
 import text_display
+import re
 
 # MAP SIZE centered on player position, must be an odd number
 MAP_SIZE = 7
@@ -32,6 +33,31 @@ class Game:
     def get_region_string(self) -> str:
         return self.get_player_region().get("name") or self.game_data.data.get("player").get("region")
 
+    def format_text(self, text: str) -> str:
+        def replace(match):
+            path = match.group(1).split(".")
+            value = self.game_data.data
+
+            for key in path:
+                if not isinstance(value, dict) or key not in value:
+                    return match.group(0)
+                value = value[key]
+
+            return str(value)
+
+        return re.sub(r"\{([a-zA-Z0-9_.]+)\}", replace, text)
+
+    def loop_dialogue(self, dialogue: str | list[str]) -> None:
+        if isinstance(dialogue, str):
+            self.display.clear_terminal()
+            self.display.text(self.format_text(dialogue))
+            self.await_input
+        else:
+            for dia in dialogue:
+                self.display.clear_terminal()
+                self.display.text(self.format_text(dia))
+                self.await_input()
+
     def get_map(self) -> str:
         player_data = self.game_data.data.get("player")
         room_position = player_data["room_position"]
@@ -57,6 +83,23 @@ class Game:
             map_str += "\n"
 
         return map_str
+
+    def enter_room(self):
+        data = self.game_data.data
+        player_data = data.get("player")
+        region = player_data["region"]
+        room_position = player_data["room_position"]
+        room_data = data.get("regions").get(region).get("rooms").get(f"{room_position[0]},{room_position[1]}")
+
+        room_dialogue = room_data.get("message", {}).get("text")
+
+        repeat_dialogue = room_data.get("message", {}).get("repeat")
+        played_dialogue = room_data.get("message", {}).get("replayed")
+
+        if room_dialogue and (repeat_dialogue or (not repeat_dialogue and not played_dialogue)):
+            self.loop_dialogue(room_dialogue)
+            if repeat_dialogue and not played_dialogue:
+                room_data["message"]["played"] = True
 
     def player_move(self):
         player_data = self.game_data.data.get("player")
@@ -95,6 +138,7 @@ class Game:
             offset = directions[dir_selection][1]
             room_position[0] += offset[0]
             room_position[1] += offset[1]
+        self.enter_room()
             
     def play_game(self) -> None:
         """Display the loaded game's introduction and main choice menu."""

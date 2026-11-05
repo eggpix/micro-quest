@@ -94,7 +94,8 @@ class Game:
     def check_conditions(self, condition_parent: dict) -> bool:
         data = self.game_data.data
         player_data = data.get("player")
-        conditions = condition_parent.get("conditions")
+        conditions = condition_parent.get("conditions", [])
+        player_inventory = player_data.get("inventory") or {}
         for condition in conditions:
             condition_type = condition.get("type")
             match condition_type:
@@ -102,26 +103,7 @@ class Game:
                     condition_item = condition.get("item")
                     if condition_item is None:
                         return True
-                    player_inventory = player_data.get("inventory") or {}
-                    if condition_item in player_inventory:
-                        success = condition_parent.get("success")
-                        if success:
-                            success_dialogue = success.get("message")
-                            if success_dialogue:
-                                self.display.clear_terminal()
-                                self.loop_dialogue(success_dialogue)
-                                self.await_input()
-                        events = condition_parent.get("events")
-                        if events:
-                            if isinstance(events, dict):
-                                events = [events]
-                            for event in events:
-                                match event.get("type"):
-                                    case "remove_item":
-                                        event_item = event.get("item")
-                                        if event_item:
-                                            player_inventory.pop(event_item, None)
-                    else:
+                    if condition_item not in player_inventory:
                         failure = condition_parent.get("failure")
                         if failure:
                             failure_dialogue = failure.get("message")
@@ -130,7 +112,27 @@ class Game:
                                 self.loop_dialogue(failure_dialogue)
                                 self.await_input()
                         return False
-                    return True
+
+        success = condition_parent.get("success")
+        if success:
+            success_dialogue = success.get("message")
+            if success_dialogue:
+                self.display.clear_terminal()
+                self.loop_dialogue(success_dialogue)
+                self.await_input()
+
+        events = condition_parent.get("events")
+        if events:
+            if isinstance(events, dict):
+                events = [events]
+            for event in events:
+                match event.get("type"):
+                    case "remove_item":
+                        event_item = event.get("item")
+                        if event_item:
+                            player_inventory.pop(event_item, None)
+
+        return True
 
     def move_conditions(self, direction: str) -> bool:
         room_data = self.get_room_data()
@@ -154,6 +156,25 @@ class Game:
                 return True
 
         return True
+
+    def get_connection_destination(
+        self, direction: str, offset: tuple[int, int]
+    ) -> tuple[str, list[int]]:
+        """Return a connection's explicit destination or its adjacent room."""
+        player_data = self.game_data.data.get("player")
+        connections = self.get_room_data().get("connections") or {}
+        connection = connections.get(direction, {})
+        current_position = player_data["room_position"]
+        destination_region = connection.get("region", player_data["region"])
+        destination_position = connection.get("room_position")
+
+        if destination_position is None:
+            destination_position = [
+                current_position[0] + offset[0],
+                current_position[1] + offset[1],
+            ]
+
+        return destination_region, destination_position
 
     def get_room_items(self) -> list[str]:
         room_data = self.get_room_data()
@@ -231,13 +252,23 @@ class Game:
         direction_options = {}
 
         for key, (label, offset) in directions.items():
-            x = room_position[0] + offset[0]
-            y = room_position[1] + offset[1]
-
             current_room = rooms.get(f"{room_position[0]},{room_position[1]}", {})
             blocked_directions = current_room.get("block", [])
+            if label.lower() in blocked_directions:
+                continue
 
-            if f"{x},{y}" in rooms and label.lower() not in blocked_directions:
+            destination_region, destination_position = (
+                self.get_connection_destination(label.lower(), offset)
+            )
+            destination_rooms = (
+                self.game_data.data.get("regions", {})
+                .get(destination_region, {})
+                .get("rooms", {})
+            )
+            if (
+                f"{destination_position[0]},{destination_position[1]}"
+                in destination_rooms
+            ):
                 direction_options[key] = label
 
         direction_options["0"] = "Cancel"
@@ -257,10 +288,14 @@ class Game:
 
         # Check conditions before entering
         if self.move_conditions(directions[dir_selection][0].lower()):
-            if dir_selection in directions:
-                offset = directions[dir_selection][1]
-                room_position[0] += offset[0]
-                room_position[1] += offset[1]
+            direction = directions[dir_selection][0].lower()
+            destination_region, destination_position = (
+                self.get_connection_destination(
+                    direction, directions[dir_selection][1]
+                )
+            )
+            player_data["region"] = destination_region
+            player_data["room_position"] = destination_position
 
             self.enter_room()
             

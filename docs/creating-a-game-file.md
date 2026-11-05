@@ -207,3 +207,36 @@ to `true` to let the player pick it up from the room's item menu.
 Items without `"collectable": true` remain in the room and cannot be picked
 up. Collected items are removed from the room and added to the player's
 `"inventory"`.
+
+## 5. Connect Rooms
+
+Rooms can define `"connections"` to create exits in a direction that lead
+outside the adjacent room grid or to another region. Each connection is keyed
+by a direction (`"up"`, `"down"`, `"left"`, or `"right"`). Its optional
+`"region"` and `"room_position"` members specify the destination; omitted
+members default to the current region and the adjacent room in that direction.
+Connections can also include the same `"conditions"`, `"success"`, `"failure"`,
+and `"events"` members used for conditional movement.
+
+```json
+"3,-1": {
+    "connections": {
+        "up": {
+            "region": "courtyard",
+            "room_position": [0, 0],
+            "conditions": [
+                {
+                    "type": "has_item",
+                    "item": "iron_key"
+                }
+            ],
+            "success": {
+                "message": "The gate opens."
+            },
+            "failure": {
+                "message": "The gate is locked."
+            }
+        }
+    }
+}
+```

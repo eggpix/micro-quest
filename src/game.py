@@ -93,13 +93,14 @@ class Game:
 
         room_dialogue = room_data.get("message", {}).get("text")
 
-        repeat_dialogue = room_data.get("message", {}).get("repeat")
-        played_dialogue = room_data.get("message", {}).get("played")
+        repeat_dialogue = room_data.get("message", {}).get("repeat", True)
+        played_dialogue = room_data.get("message", {}).get("played", False)
 
-        if room_dialogue and (repeat_dialogue or (not repeat_dialogue and not played_dialogue)):
-            self.loop_dialogue(room_dialogue)
-            if repeat_dialogue and not played_dialogue:
-                room_data["message"]["played"] = True
+        if room_dialogue:
+            if not played_dialogue:
+                self.loop_dialogue(room_dialogue)
+                if not repeat_dialogue:
+                    room_data["message"]["played"] = True
 
     def player_move(self):
         player_data = self.game_data.data.get("player")

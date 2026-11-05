@@ -1,0 +1,695 @@
+{
+    "note": "This is an AI-generated sample project for testing.",
+    
+    "title": "The Last Light of Greyhaven",
+    "description": "Explore a fading harbor, uncover the lighthouse keeper's secret, and restore the beacon before another ship is lost.",
+    "status": "active",
+    "completed": false,
+    "player": {
+        "name": "Jane",
+        "region": "harbor",
+        "room_position": [
+            0,
+            0
+        ],
+        "inventory": {}
+    },
+    "regions": {
+        "harbor": {
+            "name": "Greyhaven Harbor",
+            "rooms": {
+                "0,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "Welcome to Greyhaven, {player.name}.",
+                            "You stand in the old harbor square, where fishing boats once crowded the water.",
+                            "Tonight, the sea is unusually dark. The lighthouse has been unlit for three nights, and ships are beginning to avoid the coast.",
+                            "The harbor master has left a note on the notice board: 'The beacon can be restored, but the keeper sealed the tower before he disappeared.'",
+                            "You decide to find a way into the lighthouse and discover what happened."
+                        ]
+                    }
+                },
+                "0,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A stone walkway leads north from the harbor square.",
+                            "The tide has stained the lower stones, and small shells have collected in the cracks.",
+                            "A set of fresh footprints crosses the damp path before disappearing near the shipyard.",
+                            "Someone has been moving around the harbor recently."
+                        ]
+                    }
+                },
+                "0,2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You reach the old shipwright's yard.",
+                            "Half-built boats rest beneath canvas covers, their wooden frames grey with age.",
+                            "A workbench is scattered with nails, rope, and sketches of ships.",
+                            "One drawing shows a lighthouse lens surrounded by two curved pieces of glass."
+                        ]
+                    }
+                },
+                "1,2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "The ropewalk stretches east along the water.",
+                            "Long coils of rope hang from wooden posts, stiff from years of salt and wind.",
+                            "A ledger on a small table lists deliveries to the lighthouse keeper.",
+                            "The last entry reads: 'One brass key returned for safekeeping.'"
+                        ]
+                    }
+                },
+                "2,2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You enter a small cottage that once belonged to the harbor's lamp tender.",
+                            "The room is tidy, despite the dust. A lantern sits beside a stack of maintenance records.",
+                            "A note tucked inside the ledger says: 'The eastern door of the lighthouse is still secured. Keep the brass key away from the tide.'",
+                            "Beneath the ledger, you find a small brass key."
+                        ]
+                    },
+                    "items": [
+                        "brass_key"
+                    ]
+                },
+                "2,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "This narrow storehouse smells of salt and old timber.",
+                            "Empty crates are stacked against the walls.",
+                            "A shipping label identifies several supplies as parts for the lighthouse's turning mechanism.",
+                            "A second label is marked: 'Deliver only when the keeper is present.'"
+                        ]
+                    }
+                },
+                "2,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You walk along the eastern breakwater.",
+                            "Waves strike the rocks below, sending spray over the low stone wall.",
+                            "At the end of the path stands a heavy service door set into the lighthouse foundation.",
+                            "A brass keyhole is visible beneath a faded emblem."
+                        ]
+                    },
+                    "connections": {
+                        "right": {
+                            "region": "lighthouse",
+                            "room_position": [
+                                0,
+                                0
+                            ],
+                            "repeat_condition": false,
+                            "condition_executed": false,
+                            "conditions": [
+                                {
+                                    "type": "has_item",
+                                    "item": "brass_key"
+                                }
+                            ],
+                            "success": {
+                                "message": "The brass key turns with a reluctant click. The service door opens, and a narrow passage leads into the lighthouse."
+                            },
+                            "failure": {
+                                "message": "The service door will not move. Its lock has a brass keyhole."
+                            },
+                            "events": [
+                                {
+                                    "type": "remove_item",
+                                    "item": "brass_key"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "0,-1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You follow a sloping path south of the square.",
+                            "The path descends toward the low-tide shoreline.",
+                            "An old bell hangs from a timber frame. Its rope has snapped, and the bell is silent.",
+                            "A plaque reads: 'When the beacon shines, ring the bell to welcome the returning ships.'"
+                        ]
+                    }
+                },
+                "0,-2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "The path ends at a stretch of dark shingle beach.",
+                            "Pieces of driftwood lie scattered among the stones.",
+                            "A half-buried crate bears the lighthouse's old crest, but its lid has been washed away.",
+                            "The tide has left a trail of broken glass leading east."
+                        ]
+                    }
+                },
+                "1,-2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You discover the remains of a small wreck beside the seawall.",
+                            "Most of the vessel has been reduced to splintered wood.",
+                            "A thick piece of blue glass is lodged between two beams. It resembles a lens from an old signal lamp.",
+                            "You carefully take the blue lens. It may help you see through the dark passages below the cliffs."
+                        ]
+                    },
+                    "items": [
+                        "blue_lens"
+                    ]
+                },
+                "2,-2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A narrow stone stair climbs to the top of the seawall.",
+                            "Below you, a dark opening appears between the rocks. The entrance is partly concealed by the tide.",
+                            "A faint mark beside it resembles the shape of a glass lens.",
+                            "The opening may lead beneath the cliffs."
+                        ]
+                    },
+                    "connections": {
+                        "down": {
+                            "region": "sea_caves",
+                            "room_position": [
+                                0,
+                                0
+                            ],
+                            "repeat_condition": false,
+                            "condition_executed": false,
+                            "conditions": [
+                                {
+                                    "type": "has_item",
+                                    "item": "blue_lens"
+                                }
+                            ],
+                            "success": {
+                                "message": "The blue lens catches a trace of light and reveals the safe route through the opening. You descend into the sea caves."
+                            },
+                            "failure": {
+                                "message": "The passage is too dark to navigate safely. A blue signal lens may reveal the way."
+                            }
+                        }
+                    }
+                },
+                "1,-1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "An old boat shed stands between the square and the beach.",
+                            "A single rowboat rests upside down on wooden supports.",
+                            "Inside the shed, a charcoal sketch shows a tunnel beneath the lighthouse cliffs.",
+                            "The sketch is labelled: 'Keeper's route — use only at low tide.'"
+                        ]
+                    }
+                },
+                "-1,-1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You find a disused customs office.",
+                            "A cracked window looks out over the harbor entrance.",
+                            "Ledgers record the names of ships that once visited Greyhaven.",
+                            "The final page lists three vessels that never returned after the lighthouse went dark."
+                        ]
+                    }
+                },
+                "-1,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "This small square once served as the harbor's meeting place.",
+                            "A dry fountain stands beneath a weathered statue of a sailor.",
+                            "An inscription reads: 'A light is a promise made to those still at sea.'",
+                            "The words seem more important now than they did when they were carved."
+                        ]
+                    }
+                },
+                "-1,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You discover a ruined lookout chapel on the western side of the harbor.",
+                            "Its roof has fallen in, but a stained-glass window remains intact.",
+                            "The glass depicts a lighthouse shining over a crescent moon.",
+                            "A line beneath the window reads: 'The moon guides the keeper when the sun has gone.'"
+                        ]
+                    }
+                },
+                "-2,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A narrow path winds behind the ruined chapel.",
+                            "From here, you can see the entire harbor and the dark shape of the lighthouse.",
+                            "A stone marker bears the names of the keepers who maintained the beacon.",
+                            "The most recent name has been scratched away."
+                        ]
+                    }
+                }
+            }
+        },
+        "sea_caves": {
+            "name": "The Sea Caves",
+            "rooms": {
+                "0,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You step into a cavern beneath the cliffs.",
+                            "The entrance behind you is narrow, and waves echo through the stone.",
+                            "A pale line of mineral deposits marks the usual high-water level.",
+                            "The blue lens helped you find a safe route down. You should keep an eye on the tide."
+                        ]
+                    },
+                    "connections": {
+                        "up": {
+                            "region": "harbor",
+                            "room_position": [
+                                2,
+                                -2
+                            ],
+                            "success": {
+                                "message": "You climb back up the passage and emerge beside the harbor seawall."
+                            }
+                        }
+                    }
+                },
+                "0,-1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A low arch leads deeper beneath the cliffs.",
+                            "You must duck beneath the stone ceiling.",
+                            "The floor is covered in smooth pebbles, polished by countless tides.",
+                            "Scratches on the wall show that someone has used this passage many times."
+                        ]
+                    }
+                },
+                "1,-1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "The passage opens into an echoing chamber.",
+                            "Every movement returns as a soft whisper from the walls.",
+                            "A rusted lantern hangs from a hook, though there is no oil left inside.",
+                            "A message scratched into the stone reads: 'Follow the sound of dripping water.'"
+                        ]
+                    }
+                },
+                "1,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You follow the sound into a chamber filled with slow-dripping water.",
+                            "Small pools reflect the faint light from the entrance.",
+                            "A narrow ledge runs along the eastern wall.",
+                            "Beyond it, a dry shelf holds a bundle wrapped in oilcloth."
+                        ]
+                    }
+                },
+                "1,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You unwrap the bundle on the dry shelf.",
+                            "Inside is a chart showing the changing tides around Greyhaven.",
+                            "The chart includes a note in the keeper's handwriting: 'The beacon's gears must be set at the turning of the tide.'",
+                            "You take the tide chart. It may be essential to restoring the lighthouse."
+                        ]
+                    },
+                    "items": [
+                        "tide_chart"
+                    ]
+                },
+                "2,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A small alcove lies beyond the chart shelf.",
+                            "The ceiling is covered in pale shells, and the walls glitter with tiny crystals.",
+                            "A carved symbol shows the same two curved glass pieces seen in the shipwright's drawing.",
+                            "The keeper must have used these caves to store notes about the beacon."
+                        ]
+                    }
+                },
+                "2,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You reach a dry ledge overlooking an underground pool.",
+                            "The water is perfectly still, despite the waves crashing outside.",
+                            "An old iron ring is set into the stone, perhaps once used to secure a boat.",
+                            "A final inscription reads: 'The sea remembers every light that has guided it home.'"
+                        ]
+                    }
+                }
+            }
+        },
+        "lighthouse": {
+            "name": "The Abandoned Lighthouse",
+            "rooms": {
+                "0,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "The service passage opens into the lighthouse entrance hall.",
+                            "Dust covers the floor, but a narrow trail suggests someone has walked here recently.",
+                            "A spiral staircase rises through the center of the tower.",
+                            "A door to the west leads back to the harbor."
+                        ]
+                    },
+                    "connections": {
+                        "left": {
+                            "region": "harbor",
+                            "room_position": [
+                                2,
+                                0
+                            ],
+                            "success": {
+                                "message": "You leave the lighthouse and return to the eastern breakwater."
+                            }
+                        }
+                    }
+                },
+                "0,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You climb the first section of the spiral staircase.",
+                            "The walls are lined with old photographs of lighthouse keepers.",
+                            "The final photograph shows the missing keeper standing beside a covered lantern mechanism.",
+                            "Someone has written beneath it: 'The light is not broken. It is waiting.'"
+                        ]
+                    }
+                },
+                "0,2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You reach the upper lantern platform.",
+                            "A great circular mechanism fills the center of the room.",
+                            "Three empty fittings are set into its control panel: two curved slots and a narrow chart holder.",
+                            "The mechanism appears to require the moon prism, the sun prism, and the tide chart.",
+                            "A stairway continues upward toward the beacon chamber."
+                        ]
+                    },
+                    "connections": {
+                        "up": {
+                            "region": "beacon",
+                            "room_position": [
+                                0,
+                                0
+                            ],
+                            "repeat_condition": false,
+                            "condition_executed": false,
+                            "conditions": [
+                                {
+                                    "type": "has_item",
+                                    "item": "moon_prism"
+                                },
+                                {
+                                    "type": "has_item",
+                                    "item": "sun_prism"
+                                },
+                                {
+                                    "type": "has_item",
+                                    "item": "tide_chart"
+                                }
+                            ],
+                            "success": {
+                                "message": "You fit the two prisms into their slots and place the tide chart in its holder. The mechanism begins to turn, and the upper doors unlock."
+                            },
+                            "failure": {
+                                "message": "The beacon mechanism remains still. It needs the moon prism, the sun prism, and the tide chart."
+                            },
+                            "events": [
+                                {
+                                    "type": "remove_item",
+                                    "item": "moon_prism"
+                                },
+                                {
+                                    "type": "remove_item",
+                                    "item": "sun_prism"
+                                },
+                                {
+                                    "type": "remove_item",
+                                    "item": "tide_chart"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "-1,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A western corridor branches away from the staircase.",
+                            "Shelves contain logbooks from former lighthouse keepers.",
+                            "Most entries describe ordinary maintenance, but the final pages mention a strange failure in the beacon's turning gears.",
+                            "The keeper wrote that the two prisms had been separated for safekeeping."
+                        ]
+                    }
+                },
+                "-2,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You enter a small chart room.",
+                            "A large map of the coastline covers one wall.",
+                            "A crescent-shaped glass prism rests in a padded wooden case.",
+                            "A label identifies it as the moon prism, one of the pieces needed by the beacon."
+                        ]
+                    },
+                    "items": [
+                        "moon_prism"
+                    ]
+                },
+                "-2,2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A narrow staircase leads to the keeper's archive.",
+                            "Boxes of correspondence are stacked beneath a slanted window.",
+                            "One letter explains that the moon prism was entrusted to the archivist after a storm damaged the tower.",
+                            "The letter ends: 'Keep it apart from the sun until the tide is known.'"
+                        ]
+                    }
+                },
+                "-1,2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "This chamber contains the remains of an old clockwork regulator.",
+                            "Its gears are motionless, and a pendulum rests against the wall.",
+                            "A diagram shows how the lighthouse mechanism follows the rise and fall of the tide.",
+                            "The tide chart from the caves must contain the missing timing information."
+                        ]
+                    }
+                },
+                "1,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "An eastern corridor leads away from the main staircase.",
+                            "The wall is lined with brass pipes and small inspection windows.",
+                            "A steady draft rises from below, carrying the smell of oil and salt.",
+                            "The keeper used this passage to reach the machinery without climbing the outer stairs."
+                        ]
+                    }
+                },
+                "2,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You enter the lens workshop.",
+                            "A worktable is covered in glass-cutting tools and polishing cloths.",
+                            "A sun-shaped prism rests inside a padded metal frame.",
+                            "This must be the sun prism described in the keeper's notes."
+                        ]
+                    },
+                    "items": [
+                        "sun_prism"
+                    ]
+                },
+                "2,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "The workshop opens into a maintenance bay.",
+                            "A large gear is mounted against the wall, its teeth worn smooth.",
+                            "An oil-stained note says: 'Never force the turning gear. Align the prisms first.'",
+                            "The warning explains why the beacon could not simply be restarted."
+                        ]
+                    }
+                },
+                "1,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You find a narrow gear chamber beneath the eastern corridor.",
+                            "Small wheels and levers connect to the mechanism above.",
+                            "A brass plate bears three markings: moon, sun, and tide.",
+                            "The same three symbols appear on the tide chart."
+                        ]
+                    }
+                },
+                "0,-1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You enter the keeper's old living quarters.",
+                            "A narrow bed, a desk, and a cold stove remain in the room.",
+                            "The desk holds a half-written letter addressed to the harbor master.",
+                            "The keeper wrote: 'I have hidden the prisms and chart until someone understands that the light must serve the ships, not the tower.'"
+                        ]
+                    }
+                },
+                "0,-2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A short stair descends into the lighthouse cellar.",
+                            "Spare lantern glass and empty oil tins are stacked along the walls.",
+                            "A small window looks out toward the sea caves.",
+                            "The cellar door has been left open, as though the keeper expected to return."
+                        ]
+                    }
+                },
+                "-1,-1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "A supply room lies beside the keeper's quarters.",
+                            "Rope, hand tools, and spare hinges fill several wooden crates.",
+                            "A maintenance record shows that the keeper repaired the service door shortly before disappearing.",
+                            "The last line reads: 'The tower is ready. The sea will decide the rest.'"
+                        ]
+                    }
+                }
+            }
+        },
+        "beacon": {
+            "name": "The Beacon Chamber",
+            "rooms": {
+                "0,0": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "The upper doors open into the beacon chamber.",
+                            "A great glass lens hangs above a circular platform.",
+                            "The restored mechanism is connected to the lens by a series of brass arms.",
+                            "A narrow stair leads to the chamber's highest platform."
+                        ]
+                    },
+                    "connections": {
+                        "down": {
+                            "region": "lighthouse",
+                            "room_position": [
+                                0,
+                                2
+                            ],
+                            "success": {
+                                "message": "You descend to the lantern platform. The beacon mechanism is ready whenever you return."
+                            }
+                        }
+                    }
+                },
+                "0,1": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You step onto the focusing platform.",
+                            "The two curved prisms now sit in their proper places.",
+                            "The tide chart has aligned the mechanism with the sea's movement.",
+                            "A final lever waits beneath the great lens."
+                        ]
+                    }
+                },
+                "0,2": {
+                    "message": {
+                        "repeat": false,
+                        "played": false,
+                        "text": [
+                            "You reach the highest platform and pull the lever.",
+                            "The brass arms begin to turn. A warm light passes through the prisms and fills the chamber.",
+                            "Far below, the beam sweeps across the dark water and reaches the open sea.",
+                            "A distant ship answers with three bright lantern flashes.",
+                            "Greyhaven's beacon is shining again. The harbor will have a safe way home.",
+                            "Congratulations, {player.name}! You have restored The Last Light of Greyhaven.",
+                            "THE END"
+                        ]
+                    },
+                    "ending": true
+                }
+            }
+        }
+    },
+    "entities": {
+        "brass_key": {
+            "name": "Lighthouse Service Key",
+            "collectable": true
+        },
+        "blue_lens": {
+            "name": "Blue Signal Lens",
+            "collectable": true
+        },
+        "tide_chart": {
+            "name": "Keeper's Tide Chart",
+            "collectable": true
+        },
+        "moon_prism": {
+            "name": "Moon Prism",
+            "collectable": true
+        },
+        "sun_prism": {
+            "name": "Sun Prism",
+            "collectable": true
+        }
+    }
+}

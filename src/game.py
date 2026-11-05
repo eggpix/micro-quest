@@ -114,7 +114,7 @@ class Game:
             "D": ("Right", (1, 0))
         }
 
-        direction_options = {"0": "Cancel"}
+        direction_options = {}
 
         for key, (label, offset) in directions.items():
             x = room_position[0] + offset[0]
@@ -125,6 +125,8 @@ class Game:
 
             if f"{x},{y}" in rooms and label.lower() not in blocked_directions:
                 direction_options[key] = label
+
+        direction_options["0"] = "Cancel"
 
         self.display.clear_terminal()
 

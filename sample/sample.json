@@ -6,8 +6,8 @@
         "name": "Jane",
         "region": "fountain",
         "room_position": [
-            0,
-            0
+            2,
+            -1
         ],
         "inventory": {
             "cake": 1

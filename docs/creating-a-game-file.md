@@ -177,3 +177,33 @@ Let's add a message to one of the rooms. This message will play when the player 
 ```
 
 `"repeat": false` means that the message cannot repeat. `"played"` store whether it has.
+
+## 4. Add Collectable Items
+
+Rooms can contain items using an `"items"` array. Each item refers to an entity
+in the root-level `"entities"` object. Set the entity's `"collectable"` member
+to `true` to let the player pick it up from the room's item menu.
+
+```json
+{
+    "regions": {
+        "fountain": {
+            "rooms": {
+                "1,0": {
+                    "items": ["door_key"]
+                }
+            }
+        }
+    },
+    "entities": {
+        "door_key": {
+            "name": "Door Key",
+            "collectable": true
+        }
+    }
+}
+```
+
+Items without `"collectable": true` remain in the room and cannot be picked
+up. Collected items are removed from the room and added to the player's
+`"inventory"`.

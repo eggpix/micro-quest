@@ -84,12 +84,126 @@ class Game:
 
         return map_str
 
-    def enter_room(self):
+    def get_room_data(self) -> dict:
         data = self.game_data.data
         player_data = data.get("player")
         region = player_data["region"]
         room_position = player_data["room_position"]
-        room_data = data.get("regions").get(region).get("rooms").get(f"{room_position[0]},{room_position[1]}")
+        return data.get("regions").get(region).get("rooms").get(f"{room_position[0]},{room_position[1]}")
+
+    def check_conditions(self, condition_parent: dict) -> bool:
+        data = self.game_data.data
+        player_data = data.get("player")
+        conditions = condition_parent.get("conditions")
+        for condition in conditions:
+            condition_type = condition.get("type")
+            match condition_type:
+                case "has_item":
+                    condition_item = condition.get("item")
+                    if condition_item is None:
+                        return True
+                    player_inventory = player_data.get("inventory") or {}
+                    if condition_item in player_inventory:
+                        success = condition_parent.get("success")
+                        if success:
+                            success_dialogue = success.get("message")
+                            if success_dialogue:
+                                self.display.clear_terminal()
+                                self.loop_dialogue(success_dialogue)
+                                self.await_input()
+                        events = condition_parent.get("events")
+                        if events:
+                            if isinstance(events, dict):
+                                events = [events]
+                            for event in events:
+                                match event.get("type"):
+                                    case "remove_item":
+                                        event_item = event.get("item")
+                                        if event_item:
+                                            player_inventory.pop(event_item, None)
+                    else:
+                        failure = condition_parent.get("failure")
+                        if failure:
+                            failure_dialogue = failure.get("message")
+                            if failure_dialogue:
+                                self.display.clear_terminal()
+                                self.loop_dialogue(failure_dialogue)
+                                self.await_input()
+                        return False
+                    return True
+
+    def move_conditions(self, direction: str) -> bool:
+        room_data = self.get_room_data()
+        connections = room_data.get("connections")
+
+        if connections:
+            connection = connections.get(direction, {})
+            conditions = connection.get("conditions")
+            if conditions:
+                if (
+                    not connection.get("repeat_condition", True)
+                    and connection.get("condition_executed", False)
+                ):
+                    return True
+
+                if not self.check_conditions(connection):
+                    return False
+
+                if not connection.get("repeat_condition", True):
+                    connection["condition_executed"] = True
+                return True
+
+        return True
+
+    def get_room_items(self) -> list[str]:
+        room_data = self.get_room_data()
+        return room_data.get("items", [])
+
+    def view_room_items(self) -> None:
+        """Show items in the current room and collect eligible items."""
+        room_items = self.get_room_items()
+        if not room_items:
+            return
+
+        data = self.game_data.data
+        entities = data.get("entities", {})
+
+        options = {}
+        option_items = {}
+        for index, item in enumerate(room_items):
+            entity = entities.get(item, {})
+            entity_name = entity.get("name") or item
+            option = str(index + 1)
+            options[option] = (
+                f"Pick up {entity_name}"
+                if entity.get("collectable") is True
+                else f"{entity_name} (not collectable)"
+            )
+            option_items[option] = (index, item)
+
+        options["0"] = "Back"
+
+        selection = text_display.ListMenu(
+            "Items in this room:", options, self.display
+        ).get_input()
+        if selection == "0":
+            return
+
+        index, item = option_items[selection]
+        entity = entities.get(item, {})
+        if entity.get("collectable") is not True:
+            self.display.text(f"You cannot pick up {entity.get('name') or item}.")
+            self.await_input()
+            return
+
+        inventory = data.get("player").setdefault("inventory", {})
+        inventory[item] = inventory.get(item, 0) + 1
+        room_items.pop(index)
+        self.display.text(f"You picked up {entity.get('name') or item}.")
+        self.await_input()
+
+    def enter_room(self) -> None:
+        room_data = self.get_room_data()
 
         room_dialogue = room_data.get("message", {}).get("text")
 
@@ -102,7 +216,7 @@ class Game:
                 if not repeat_dialogue:
                     room_data["message"]["played"] = True
 
-    def player_move(self):
+    def player_move(self) -> None:
         player_data = self.game_data.data.get("player")
         room_position = player_data["room_position"]
         rooms = self.get_player_region()["rooms"]
@@ -131,17 +245,24 @@ class Game:
         self.display.clear_terminal()
 
         direction_menu = text_display.ListMenu(
-            "Choose a Direction to Move:",
+            f"{self.get_map()}\nChoose a Direction to Move:",
             direction_options,
             self.display
         )
 
         dir_selection = direction_menu.get_input().upper()
-        if dir_selection in directions:
-            offset = directions[dir_selection][1]
-            room_position[0] += offset[0]
-            room_position[1] += offset[1]
-        self.enter_room()
+
+        if dir_selection == "0":
+            return
+
+        # Check conditions before entering
+        if self.move_conditions(directions[dir_selection][0].lower()):
+            if dir_selection in directions:
+                offset = directions[dir_selection][1]
+                room_position[0] += offset[0]
+                room_position[1] += offset[1]
+
+            self.enter_room()
             
     def play_game(self) -> None:
         """Display the loaded game's introduction and main choice menu."""
@@ -154,39 +275,69 @@ class Game:
 
         self.enter_room()
 
+        def view_location():
+            px, py = data.get("player").get("room_position")
+            self.display.clear_terminal()
+            self.display.text(f"Current Region: {self.display.title(self.get_region_string())}")
+            self.display.text(f"Current Room: [{px},{py}]")
+            self.display.text(f"{self.get_map()}")
+            self.await_input()
+
+
+        def view_inventory():
+            self.display.clear_terminal()
+            self.display.text("Inventory:")
+
+            for item, quantity in data.get("player").get("inventory").items():
+                entity_name = data.get("entities", {}).get(item, {}).get("name") or item
+                self.display.text(f"{quantity}x {entity_name}")
+
+            self.await_input()
+
+
         while True:
             self.display.clear_terminal()
+
             player_has_inventory = bool(data.get("player").get("inventory"))
+            room_items = self.get_room_items()
+
+            index = 2
+
             room_options = {
                 "1": "Move",
-                "2": "View Location",
-                **({"3": "View Inventory"} if player_has_inventory else {}),
-                "0": "Save and Exit"
+                "2": "View Location"
             }
+
+            actions = {
+                "1": self.player_move,
+                "2": view_location
+            }
+
+            if player_has_inventory:
+                index += 1
+                room_options[str(index)] = "View Inventory"
+                actions[str(index)] = view_inventory
+
+            if room_items:
+                index += 1
+                room_options[str(index)] = "View Room Items"
+                actions[str(index)] = self.view_room_items  # Your room items method
+
+            room_options["0"] = "Save and Exit"
+            actions["0"] = self.game_data.save_game_file
+
             room_menu = text_display.ListMenu(
                 "Choose an option:", room_options, self.display
             )
+
             selection = room_menu.get_input()
-            match selection:
-                case "1":
-                    self.player_move()
-                case "2":
-                    px = data.get("player").get("room_position")[0] # Player room x
-                    py = data.get("player").get("room_position")[1] # Player room y
-                    self.display.clear_terminal()
-                    self.display.text(f"Current Region: {self.display.title(self.get_region_string())}")
-                    self.display.text(f"Current Room: [{px},{py}]")
-                    self.display.text(f"{self.get_map()}")
-                    self.await_input()
-                case "3" if player_has_inventory:
-                    self.display.clear_terminal()
-                    self.display.text("Inventory:")
-                    for item, quantity in data.get("player").get("inventory").items():
-                        entity_name = data.get("entities", {}).get(item, {}).get("name") or item
-                        self.display.text(f"{quantity}x {entity_name}")
-                    self.await_input()
-                case "0":
-                    self.game_data.save_game_file()
+
+            action = actions.get(selection)
+
+            if action:
+                action()
+
+                if selection == "0":
                     return
 
     def get_game_file(self) -> bool:

@@ -7,7 +7,7 @@
         "region": "fountain",
         "room_position": [
             2,
-            -1
+            -2
         ],
         "inventory": {
             "cake": 1
@@ -31,6 +31,7 @@
                     ]
                 },
                 "1,0": {
+                    "items": [],
                     "block": [
                         "up"
                     ]
@@ -42,7 +43,32 @@
                     ]
                 },
                 "2,0": {},
-                "2,-1": {},
+                "2,-1": {
+                    "connections": {
+                        "up": {
+                            "repeat_condition": false,
+                            "condition_executed": true,
+                            "conditions": [
+                                {
+                                    "type": "has_item",
+                                    "item": "key_0"
+                                }
+                            ],
+                            "success": {
+                                "message": "You unlock the door with your key."
+                            },
+                            "failure": {
+                                "message": "The door is locked. You need a key."
+                            },
+                            "events": [
+                                {
+                                    "type": "remove_item",
+                                    "item": "key_0"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "2,-2": {}
             }
         }
@@ -50,6 +76,10 @@
     "entities": {
         "cake": {
             "name": "Cake"
+        },
+        "key_0": {
+            "name": "Door Key",
+            "collectable": true
         }
     }
 }

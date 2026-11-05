@@ -141,19 +141,23 @@ class Game:
         if connections:
             connection = connections.get(direction, {})
             conditions = connection.get("conditions")
-            if conditions:
-                if (
-                    not connection.get("repeat_condition", True)
-                    and connection.get("condition_executed", False)
-                ):
-                    return True
-
-                if not self.check_conditions(connection):
-                    return False
-
-                if not connection.get("repeat_condition", True):
-                    connection["condition_executed"] = True
+            has_connection_actions = bool(
+                conditions or connection.get("success") or connection.get("events")
+            )
+            if not has_connection_actions:
                 return True
+
+            if (
+                not connection.get("repeat_condition", True)
+                and connection.get("condition_executed", False)
+            ):
+                return True
+
+            if not self.check_conditions(connection):
+                return False
+
+            if not connection.get("repeat_condition", True):
+                connection["condition_executed"] = True
 
         return True
 
@@ -237,6 +241,20 @@ class Game:
                 if not repeat_dialogue:
                     room_data["message"]["played"] = True
 
+        if room_data.get("ending") and not self.game_data.data.get("completed"):
+            player_data = self.game_data.data.get("player")
+            inventory = player_data.setdefault("inventory", {})
+            entities = self.game_data.data.get("entities", {})
+            remaining_items = []
+            for item in room_data.get("items", []):
+                if entities.get(item, {}).get("collectable") is True:
+                    inventory[item] = inventory.get(item, 0) + 1
+                else:
+                    remaining_items.append(item)
+            room_data["items"] = remaining_items
+            self.game_data.data["completed"] = True
+            self.game_data.save_game_file()
+
     def player_move(self) -> None:
         player_data = self.game_data.data.get("player")
         room_position = player_data["room_position"]
@@ -308,7 +326,14 @@ class Game:
         self.display.text(data.get("description") or "")
         self.await_input()
 
+        if data.get("completed"):
+            self.display.text("This game has already been completed.")
+            self.await_input()
+            return
+
         self.enter_room()
+        if data.get("completed"):
+            return
 
         def view_location():
             px, py = data.get("player").get("room_position")
@@ -371,6 +396,9 @@ class Game:
 
             if action:
                 action()
+
+                if data.get("completed"):
+                    return
 
                 if selection == "0":
                     return

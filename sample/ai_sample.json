@@ -2,6 +2,7 @@
     "title": "The Crown Beneath the Castle",
     "description": "Explore an abandoned castle, uncover its secrets, and recover the missing royal crown.",
     "status": "active",
+    "completed": false,
     "player": {
         "name": "Jane",
         "region": "fountain",
@@ -20,6 +21,8 @@
             "rooms": {
                 "0,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "Welcome to the Forgotten Gardens, {player.name}.",
                             "You stand before an enormous stone fountain. Its basin is dry, and weeds have grown between the surrounding stones.",
@@ -31,6 +34,8 @@
                 },
                 "0,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You follow a narrow path north of the fountain.",
                             "Tall hedges surround you, forming a maze of green corridors.",
@@ -41,6 +46,8 @@
                 },
                 "0,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover a small garden plaza.",
                             "At its center stands a statue of the castle's former queen.",
@@ -52,6 +59,8 @@
                 },
                 "1,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "The hedges become increasingly dense as you travel east.",
                             "You find an old wooden bench covered in moss.",
@@ -65,6 +74,8 @@
                         "silver_coin"
                     ],
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You reach a secluded corner of the gardens.",
                             "An ornamental basin sits beneath a large tree. Although the water has disappeared, something glimmers at the bottom.",
@@ -75,6 +86,8 @@
                 },
                 "2,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "A narrow staircase leads down toward an old stone platform.",
                             "You recognize the platform as part of the fountain's original water system.",
@@ -85,6 +98,8 @@
                 },
                 "1,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You walk along a cobblestone path beside the fountain.",
                             "The path is lined with empty flowerbeds and broken lanterns.",
@@ -95,6 +110,8 @@
                 },
                 "2,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover the remains of an ornamental pool.",
                             "A decorative stone bridge crosses its center.",
@@ -105,6 +122,8 @@
                 },
                 "0,-1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You follow the path south of the fountain.",
                             "The roses growing here have become tangled and overgrown.",
@@ -116,6 +135,8 @@
                 "0,-2": {
                     "items": [],
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover a small gardener's shed hidden behind the rose bushes.",
                             "Inside, you find a workbench, a broken watering can, and several empty pots.",
@@ -126,6 +147,8 @@
                 },
                 "1,-2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You follow a narrow trail east of the gardener's shed.",
                             "An old wooden cart has been abandoned beside the path.",
@@ -136,6 +159,8 @@
                 },
                 "2,-2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You reach an old water pump.",
                             "The handle is stiff, and the machinery beneath it is completely rusted.",
@@ -146,6 +171,8 @@
                 },
                 "2,-1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You find a narrow path leading toward an iron gate.",
                             "The gate is decorated with the same royal emblem found on the fountain.",
@@ -155,6 +182,8 @@
                 },
                 "3,-1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You stand before the eastern garden gate.",
                             "Beyond it lies the castle courtyard.",
@@ -198,6 +227,8 @@
             "rooms": {
                 "0,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the castle courtyard.",
                             "The enormous courtyard is surrounded by tall stone walls and elaborate archways.",
@@ -261,6 +292,8 @@
                 },
                 "0,-1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter a covered arcade beneath the courtyard.",
                             "The ceiling is decorated with paintings of former kings and queens.",
@@ -271,6 +304,8 @@
                 },
                 "0,-2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "The covered arcade opens into a quiet passage.",
                             "An old marble fountain stands against the wall.",
@@ -285,6 +320,8 @@
                                 3,
                                 -1
                             ],
+                            "repeat_condition": false,
+                            "condition_executed": false,
                             "success": {
                                 "message": "You pass through an old service passage and return to the Forgotten Gardens."
                             }
@@ -293,6 +330,8 @@
                 },
                 "1,-2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover a narrow alcove beneath the arcade.",
                             "Several old maintenance tools are scattered across the floor.",
@@ -303,6 +342,8 @@
                 },
                 "2,-2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You reach the far end of the lower courtyard.",
                             "A large stone sundial stands against the wall.",
@@ -313,6 +354,8 @@
                 },
                 "2,-1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover an unusual stone doorway hidden behind a decorative pillar.",
                             "A circular indentation is carved into the center of the door.",
@@ -356,6 +399,8 @@
             "rooms": {
                 "0,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the royal library.",
                             "Thousands of books line the walls, many of them covered in dust.",
@@ -376,6 +421,8 @@
                 },
                 "0,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the main reading hall.",
                             "Rows of wooden tables stretch across the room.",
@@ -387,6 +434,8 @@
                 },
                 "0,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You find a small reading room overlooking the gardens.",
                             "A large window lets in a beam of sunlight.",
@@ -397,6 +446,8 @@
                 },
                 "1,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter a room filled with maps.",
                             "Some depict the castle grounds, while others show distant kingdoms.",
@@ -407,6 +458,8 @@
                 },
                 "2,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the restricted archive.",
                             "A heavy wooden table is covered in old documents.",
@@ -420,6 +473,8 @@
                         "moon_key"
                     ],
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover the royal archivist's desk.",
                             "An old chair sits behind it, facing the library entrance.",
@@ -431,6 +486,8 @@
                 },
                 "1,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover a balcony overlooking the main reading hall.",
                             "The railing is decorated with carvings of stars and constellations.",
@@ -441,6 +498,8 @@
                 },
                 "-1,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You find a small genealogy alcove.",
                             "Portraits of former royal family members hang along the walls.",
@@ -451,6 +510,8 @@
                 },
                 "-2,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "This room contains records of the castle's oldest inhabitants.",
                             "A shelf has collapsed, leaving books scattered across the floor.",
@@ -461,6 +522,8 @@
                 },
                 "-2,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter a narrow section of the library known as the Dust Stacks.",
                             "The shelves are packed tightly together.",
@@ -474,6 +537,8 @@
                         "page_fragment"
                     ],
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "A fallen bookshelf has created a small opening behind the stacks.",
                             "Inside, you discover a hidden compartment.",
@@ -489,6 +554,8 @@
             "rooms": {
                 "0,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the royal chapel.",
                             "Tall stained-glass windows cast colorful patterns across the floor.",
@@ -509,6 +576,8 @@
                 },
                 "1,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You walk between the rows of wooden pews.",
                             "Several hymn books remain on their seats.",
@@ -518,6 +587,8 @@
                 },
                 "2,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter a small room beside the chapel.",
                             "A wooden cabinet contains old ceremonial clothing.",
@@ -528,6 +599,8 @@
                 },
                 "2,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover a narrow staircase leading upward.",
                             "The walls are decorated with paintings of the sun rising over distant mountains.",
@@ -541,6 +614,8 @@
                         "sun_key"
                     ],
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You reach the eastern altar.",
                             "A large stained-glass window depicts a golden sun surrounded by rays of light.",
@@ -552,6 +627,8 @@
                 },
                 "1,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You find a small choir loft.",
                             "An old wooden music stand holds a collection of handwritten songs.",
@@ -562,6 +639,8 @@
                 },
                 "0,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the chapel's bell chamber.",
                             "A large bell hangs above the room, suspended from an ancient wooden frame.",
@@ -575,6 +654,8 @@
                         "bell_clapper"
                     ],
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover an old storage room beside the bell chamber.",
                             "Broken candles and wooden boxes are scattered across the floor.",
@@ -585,6 +666,8 @@
                 },
                 "-1,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter a narrow passage beside the chapel.",
                             "A row of small stained-glass windows depicts scenes from the castle's history.",
@@ -595,6 +678,8 @@
                 },
                 "0,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You return to the chapel's central aisle.",
                             "The afternoon light streams through the windows.",
@@ -610,6 +695,8 @@
             "rooms": {
                 "0,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "The stone doorway closes behind you.",
                             "You have entered the royal crypt, an underground chamber beneath the castle.",
@@ -629,6 +716,8 @@
                 },
                 "0,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You descend into the main crypt corridor.",
                             "Stone sarcophagi line both walls.",
@@ -639,6 +728,8 @@
                 },
                 "0,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You reach a large underground chamber.",
                             "The ceiling is supported by thick stone pillars.",
@@ -652,6 +743,8 @@
                         "crypt_relic"
                     ],
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover a small tomb decorated with silver ornaments.",
                             "A stone inscription identifies its occupant as Sir Rowan, a knight who served the royal family.",
@@ -662,6 +755,8 @@
                 },
                 "1,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter a narrow chamber filled with old weapons and shields.",
                             "Most are badly corroded.",
@@ -672,6 +767,8 @@
                 },
                 "-1,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover a small memorial room.",
                             "Candles have been placed before several stone tablets.",
@@ -682,6 +779,8 @@
                 },
                 "-1,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter an underground archive.",
                             "Old scrolls and stone tablets are stored in wooden cabinets.",
@@ -692,6 +791,8 @@
                 },
                 "-2,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "A small chamber lies beyond the archive.",
                             "The walls are covered in faded writing.",
@@ -702,6 +803,8 @@
                 },
                 "-2,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You reach the far end of the crypt.",
                             "A stone bench stands beneath an ancient mural.",
@@ -717,6 +820,8 @@
             "rooms": {
                 "0,0": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "The massive doors close behind you.",
                             "You have entered the royal vault.",
@@ -737,6 +842,8 @@
                 },
                 "0,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the Hall of Guardians.",
                             "Large stone statues stand on either side of the passage.",
@@ -747,6 +854,8 @@
                 },
                 "0,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You reach a gallery filled with royal portraits.",
                             "The paintings depict generations of kings and queens.",
@@ -757,6 +866,8 @@
                 },
                 "1,2": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter a small chamber containing several empty treasure chests.",
                             "Their contents have long since been removed.",
@@ -766,10 +877,13 @@
                     }
                 },
                 "2,2": {
+                    "ending": true,
                     "items": [
                         "crown"
                     ],
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the innermost chamber of the royal vault.",
                             "A golden crown rests upon a stone pedestal.",
@@ -782,6 +896,8 @@
                 },
                 "2,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You discover a small side chamber.",
                             "A collection of royal documents is stored in a locked display case.",
@@ -792,6 +908,8 @@
                 },
                 "1,1": {
                     "message": {
+                        "repeat": false,
+                        "played": false,
                         "text": [
                             "You enter the Chamber of Mirrors.",
                             "Several tall mirrors line the walls.",

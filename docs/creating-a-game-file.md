@@ -176,7 +176,9 @@ Let's add a message to one of the rooms. This message will play when the player 
     }
 ```
 
-`"repeat": false` means that the message cannot repeat. `"played"` store whether it has.
+`"repeat": false` means that the message cannot repeat. The engine sets
+`"played"` to `true` after displaying it. Set `"played": false` when starting
+a new game.
 
 ## 4. Add Collectable Items
 
@@ -217,6 +219,10 @@ by a direction (`"up"`, `"down"`, `"left"`, or `"right"`). Its optional
 members default to the current region and the adjacent room in that direction.
 Connections can also include the same `"conditions"`, `"success"`, `"failure"`,
 and `"events"` members used for conditional movement.
+`"success"` is displayed when a connection is taken even if it has no
+`"conditions"`. Use `"repeat_condition": false` and
+`"condition_executed": false` to run a connection's conditions, success
+message, and events only the first time they succeed.
 
 ```json
 "3,-1": {
@@ -240,3 +246,10 @@ and `"events"` members used for conditional movement.
     }
 }
 ```
+
+## 6. End a Game
+
+Set `"ending": true` on a room to complete the game when the player enters it.
+The engine sets the root-level `"completed"` member to `true`, automatically
+adds collectable items in that room to the player's inventory, saves the game,
+and exits play. Initialize `"completed": false` in a new game file.

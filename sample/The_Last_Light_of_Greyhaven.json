@@ -6,10 +6,10 @@
     "completed": false,
     "player": {
         "name": "Jane",
-        "region": "harbor",
+        "region": "sea_caves",
         "room_position": [
-            2,
-            -2
+            0,
+            0
         ],
         "inventory": {
             "blue_lens": 1
@@ -192,7 +192,7 @@
                                 0
                             ],
                             "repeat_condition": false,
-                            "condition_executed": false,
+                            "condition_executed": true,
                             "conditions": [
                                 {
                                     "type": "has_item",
@@ -276,7 +276,7 @@
                 "0,0": {
                     "message": {
                         "repeat": false,
-                        "played": false,
+                        "played": true,
                         "text": [
                             "You step into a cavern beneath the cliffs.",
                             "The entrance behind you is narrow, and waves echo through the stone.",

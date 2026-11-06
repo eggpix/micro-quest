@@ -51,12 +51,22 @@ class Game:
         if isinstance(dialogue, str):
             self.display.clear_terminal()
             self.display.text(self.format_text(dialogue))
-            self.await_input
-        else:
-            for dia in dialogue:
-                self.display.clear_terminal()
-                self.display.text(self.format_text(dia))
-                self.await_input()
+            self.await_input()
+            return
+
+        if self.display.config.get("concatenate_dialogue", False):
+            self.display.clear_terminal()
+            combined_dialogue = "\n".join(
+                self.format_text(dia) for dia in dialogue
+            )
+            self.display.text(combined_dialogue)
+            self.await_input()
+            return
+
+        for dia in dialogue:
+            self.display.clear_terminal()
+            self.display.text(self.format_text(dia))
+            self.await_input()
 
     def get_map(self) -> str:
         player_data = self.game_data.data.get("player")
@@ -108,18 +118,14 @@ class Game:
                         if failure:
                             failure_dialogue = failure.get("message")
                             if failure_dialogue:
-                                self.display.clear_terminal()
                                 self.loop_dialogue(failure_dialogue)
-                                self.await_input()
                         return False
 
         success = condition_parent.get("success")
         if success:
             success_dialogue = success.get("message")
             if success_dialogue:
-                self.display.clear_terminal()
                 self.loop_dialogue(success_dialogue)
-                self.await_input()
 
         events = condition_parent.get("events")
         if events:

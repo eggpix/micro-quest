@@ -71,20 +71,28 @@ class ListMenu:
 
     def __init__(
         self,
-        title: str,
+        title: str, # Formatted
         options: dict[str, str],
         display: TextDisplay,
+        description: str | None = None, # Not Formatted
+        context: str | None = None # Displayed before title
     ) -> None:
         """Create a menu with a title, keyed options, and a display."""
         self.title = title
         self.options = options
         self.display = display
+        self.description = description
+        self.context = context
 
     def show(self) -> None:
         """Display the menu, optionally clearing the terminal."""
         self.display.clear_terminal()
 
+        if self.context is not None:
+            self.display.text(self.context)
         self.display.text(self.display.title(self.title))
+        if self.description is not None:
+            self.display.text(self.description)
 
         for key, option in self.options.items():
             self.display.text(f"{self.display.key(f'[{key}]')} {option}")

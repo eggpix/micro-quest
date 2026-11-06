@@ -299,6 +299,8 @@ Connections can also include `"conditions"`, `"success"`, `"failure"`, and
 destination region's name (or its key when no name is set). The destination
 room must exist for the exit to be offered.
 
+> **Note:** Connections override default movement behavior. If a room is placed in the `up` direction but a connection overrides it and transports to another region, that room is inaccessible unless another path to it exists. It is recomended not to overlap rooms with connections to regions to avoid player confusion. (If moving left transports to another region, don't put a room to the left.)
+
 ```json
 "3,-1": {
     "connections": {

@@ -124,7 +124,11 @@ class Game:
                     cell = "[ ]"
                     if has_color:
                         try:
-                            cell = self.display.color_background(cell, color)
+                            cell = (
+                                self.display.color_foreground("[", color)
+                                + " "
+                                + self.display.color_foreground("]", color)
+                            )
                         except ValueError as error:
                             map_errors.append(
                                 self.display.error(

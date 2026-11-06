@@ -7,14 +7,14 @@ from pathlib import Path
 class MainMenu:
     """Responsible for prompting user to edit config or load a game."""
 
-    def __init__(self, display, config, game_data, await_input, play_game):
+    def __init__(self, display, config, game_data, await_input, play_game) -> None:
         self.display = display
         self.config = config
         self.game_data = game_data
         self.await_input = await_input
         self.play_game = play_game
 
-    def run(self):
+    def run(self) -> None:
         options = {
             "1": "Load Game",
             "2": "Load Last Save",
@@ -84,7 +84,7 @@ class MainMenu:
             )
             self.display.text(
                 "Enter a file path to create a new copy "
-                f"(default: {self.display.path(str(default_path))})."
+                f"(default: {self.display.format(str(default_path), ansi_format="path")})."
             )
             self.display.text(f"{self.display.format("[0]", ansi_format="key")} Cancel")
             destination = input("> ").strip()

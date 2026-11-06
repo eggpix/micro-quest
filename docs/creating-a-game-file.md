@@ -245,6 +245,33 @@ otherwise the item key is shown. Players can drop one item at a time unless
 the entity has `"droppable": false` or the current room has
 `"contain_items": false`. Both members default to `true` when omitted.
 
+An entity can define `"interactions"` for actions available while it is in a
+room. Each interaction has a display `"name"` and a `"message"` shown when
+selected. The interaction key is used as the name if `"name"` is omitted.
+Interactions do not pick up or remove the entity. For example:
+
+```json
+"harbor_bell": {
+    "name": "Harbor Bell",
+    "item": false,
+    "interactions": {
+        "inspect": {
+            "name": "Inspect",
+            "message": "The bell is old and weathered."
+        },
+        "ring": {
+            "name": "Ring",
+            "message": "The bell rings loudly."
+        }
+    }
+}
+```
+
+An entity with `"item": false` cannot be picked up, even if it is also marked
+`"collectable": true`. Entities with interactions are presented as interactable
+in the room-item menu. If an interactable entity is also collectable, its
+interaction menu includes a separate **Pick up** choice.
+
 ## 5. Connect Rooms
 
 Rooms can define `"connections"` to create exits in a direction that lead

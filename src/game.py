@@ -190,6 +190,13 @@ class Game:
         room_data = self.get_room_data()
         return room_data.get("items", [])
 
+    def is_collectable_entity(self, entity: dict) -> bool:
+        """Return whether an entity can be picked up into inventory."""
+        return (
+            entity.get("collectable") is True
+            and entity.get("item", True) is not False
+        )
+
     def view_room_items(self) -> None:
         """Show items in the current room and collect eligible items."""
         room_items = self.get_room_items()
@@ -205,11 +212,17 @@ class Game:
             entity = entities.get(item, {})
             entity_name = entity.get("name") or item
             option = str(index + 1)
-            options[option] = (
-                f"Pick up {entity_name}"
-                if entity.get("collectable") is True
-                else f"{entity_name} (not collectable)"
-            )
+            interactions = entity.get("interactions") or {}
+            is_collectable = self.is_collectable_entity(entity)
+
+            if interactions:
+                action = f"Interact with {entity_name}"
+            elif is_collectable:
+                action = f"Pick up {entity_name}"
+            else:
+                action = f"{entity_name} (not collectable)"
+
+            options[option] = action
             option_items[option] = (index, item)
 
         options["0"] = "Back"
@@ -222,11 +235,57 @@ class Game:
 
         index, item = option_items[selection]
         entity = entities.get(item, {})
-        if entity.get("collectable") is not True:
+        entity_name = entity.get("name") or item
+        interactions = entity.get("interactions") or {}
+        is_collectable = self.is_collectable_entity(entity)
+
+        if interactions:
+            interaction_options = {
+                str(interaction_index): interaction.get("name") or interaction_id
+                for interaction_index, (interaction_id, interaction) in enumerate(
+                    interactions.items(), start=1
+                )
+            }
+            pickup_option = None
+            if is_collectable:
+                pickup_option = str(len(interaction_options) + 1)
+                interaction_options[pickup_option] = "Pick up"
+            interaction_options["0"] = "Back"
+
+            interaction_selection = text_display.ListMenu(
+                entity_name, interaction_options, self.display
+            ).get_input()
+            if interaction_selection == "0":
+                return
+
+            if interaction_selection == pickup_option:
+                self.collect_room_item(index, item, entity)
+                return
+
+            interaction = list(interactions.values())[
+                int(interaction_selection) - 1
+            ]
+            message = interaction.get("message")
+            if message:
+                self.loop_dialogue(message)
+            else:
+                self.display.text(
+                    f"{interaction.get('name') or 'Interaction'} has no response."
+                )
+                self.await_input()
+            return
+
+        if not is_collectable:
             self.display.text(f"You cannot pick up {entity.get('name') or item}.")
             self.await_input()
             return
 
+        self.collect_room_item(index, item, entity)
+
+    def collect_room_item(self, index: int, item: str, entity: dict) -> None:
+        """Move one collectable room item into the player's inventory."""
+        data = self.game_data.data
+        room_items = self.get_room_items()
         inventory = data.get("player").setdefault("inventory", {})
         inventory[item] = inventory.get(item, 0) + 1
         room_items.pop(index)
@@ -253,7 +312,7 @@ class Game:
             entities = self.game_data.data.get("entities", {})
             remaining_items = []
             for item in room_data.get("items", []):
-                if entities.get(item, {}).get("collectable") is True:
+                if self.is_collectable_entity(entities.get(item, {})):
                     inventory[item] = inventory.get(item, 0) + 1
                 else:
                     remaining_items.append(item)
@@ -390,8 +449,13 @@ class Game:
                 "No additional information for this item."
             )
             item_options = {}
+            option_index = 1
             if can_drop:
-                item_options["1"] = "Drop one"
+                item_options[option_index] = "Drop one"
+                option_index += 1
+
+            # TODO Add inventory interactions
+
             item_options["0"] = "Back"
             drop_selection = text_display.ListMenu(
                 item_name, item_options, self.display, description=self.display.extra(description)

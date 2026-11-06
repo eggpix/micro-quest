@@ -3,7 +3,6 @@
 import re
 import shutil
 import sys
-import textwrap
 
 
 class TextDisplay:
@@ -41,6 +40,71 @@ class TextDisplay:
         """Remove ANSI escape sequences from text."""
         return self.ANSI_ESCAPE.sub("", text)
 
+    def _wrap_line(self, text: str, width: int) -> str:
+        """Wrap a line while counting only visible characters."""
+        words: list[tuple[list[str], int]] = []
+        word: list[str] = []
+        word_width = 0
+
+        for match in re.finditer(
+            rf"{self.ANSI_ESCAPE.pattern}|.", text, flags=re.DOTALL
+        ):
+            token = match.group()
+            if self.ANSI_ESCAPE.fullmatch(token):
+                word.append(token)
+            elif token.isspace():
+                if word_width:
+                    words.append((word, word_width))
+                    word = []
+                    word_width = 0
+            else:
+                word.append(token)
+                word_width += 1
+
+        if word:
+            words.append((word, word_width))
+
+        lines: list[str] = []
+        line: list[str] = []
+        line_width = 0
+
+        for word, word_width in words:
+            if not word_width:
+                line.extend(word)
+                continue
+
+            if word_width <= width:
+                if line_width and line_width + 1 + word_width > width:
+                    lines.append("".join(line))
+                    line = []
+                    line_width = 0
+                if line_width:
+                    line.append(" ")
+                line.extend(word)
+                line_width += word_width + (1 if line_width else 0)
+                continue
+
+            if line:
+                lines.append("".join(line))
+                line = []
+                line_width = 0
+
+            for token in word:
+                if self.ANSI_ESCAPE.fullmatch(token):
+                    line.append(token)
+                else:
+                    if line_width == width:
+                        lines.append("".join(line))
+                        line = []
+                        line_width = 0
+                    line.append(token)
+                    line_width += 1
+
+        if line or not lines:
+            lines.append("".join(line))
+
+        return "\n".join(lines)
+
     def format(self, text: str, ansi_format: str | None = None) -> str:
         """Apply formatting and wrapping according to configuration."""
         match ansi_format:
@@ -61,9 +125,9 @@ class TextDisplay:
             text = self.remove_formatting(text)
 
         if self.config["wrap_text"]:
-            width = shutil.get_terminal_size().columns
+            width = max(1, shutil.get_terminal_size().columns)
             text = "\n".join(
-                textwrap.fill(line, width=width) if line else ""
+                self._wrap_line(line, width) if line else ""
                 for line in text.splitlines()
             )
 

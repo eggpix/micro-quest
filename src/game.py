@@ -637,7 +637,7 @@ class Game:
     def run(self, file_path: str | None = None) -> None:
         """Start the specified game or run the main menu loop."""
         if file_path is not None:
-            if self.load_game(file_path):
+            if self.main_menu.load_game(file_path):
                 self.play_game()
             return
 

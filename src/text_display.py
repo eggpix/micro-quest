@@ -42,6 +42,9 @@ class TextDisplay:
 
     def _wrap_line(self, text: str, width: int) -> str:
         """Wrap a line while counting only visible characters."""
+        if len(self._remove_formatting(text)) <= width:
+            return text
+
         words: list[tuple[list[str], int]] = []
         word: list[str] = []
         word_width = 0

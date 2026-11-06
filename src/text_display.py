@@ -31,6 +31,9 @@ class TextDisplay:
         """Return text styled as a file-system path."""
         return f"\x1B[34m{text}\x1B[0m"
 
+    def extra(self, text: str) -> str:
+        return f"\x1B[3m{text}\x1B[0m"
+
     def key(self, text: str) -> str:
         """Return text styled as a menu key or response prompt."""
         return f"\x1B[36m{text}\x1B[0m"

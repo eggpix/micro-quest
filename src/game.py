@@ -294,9 +294,10 @@ class Game:
         self.display.clear_terminal()
 
         direction_menu = text_display.ListMenu(
-            f"{self.get_map()}\nChoose a Direction to Move:",
+            "Choose a Direction to Move:",
             direction_options,
-            self.display
+            self.display,
+            description=self.get_map()
         )
 
         dir_selection = direction_menu.get_input().upper()
@@ -379,7 +380,7 @@ class Game:
                 item_options["1"] = "Drop one"
             item_options["0"] = "Back"
             drop_selection = text_display.ListMenu(
-                f"{item_name}\n{description}", item_options, self.display
+                item_name, item_options, self.display, description=self.display.extra(description)
             ).get_input()
             if drop_selection == "0":
                 return

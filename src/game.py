@@ -287,6 +287,14 @@ class Game:
                 f"{destination_position[0]},{destination_position[1]}"
                 in destination_rooms
             ):
+                if destination_region != player_data["region"]:
+                    destination_name = (
+                        self.game_data.data.get("regions", {})
+                        .get(destination_region, {})
+                        .get("name")
+                        or destination_region
+                    )
+                    label = f"{label} (To {destination_name})"
                 direction_options[key] = label
 
         direction_options["0"] = "Cancel"

@@ -8,7 +8,7 @@
         "name": "Jane",
         "region": "harbor",
         "room_position": [
-            1,
+            2,
             -2
         ],
         "inventory": {
@@ -176,7 +176,7 @@
                 "2,-2": {
                     "message": {
                         "repeat": false,
-                        "played": false,
+                        "played": true,
                         "text": [
                             "A narrow stone stair climbs to the top of the seawall.",
                             "Below you, a dark opening appears between the rocks. The entrance is partly concealed by the tide.",

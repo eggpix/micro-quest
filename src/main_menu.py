@@ -1,14 +1,44 @@
 """Main menu handling"""
 
+import text_display
+
 from pathlib import Path
 
 class MainMenu:
-    """Responsible for prompting user to edit config or load game."""
+    """Responsible for prompting user to edit config or load a game."""
 
-    def __init__(self, game):
-        self.game = game
+    def __init__(self, display, config, game_data, await_input, play_game):
+        self.display = display
+        self.config = config
+        self.game_data = game_data
+        self.await_input = await_input
+        self.play_game = play_game
 
-    def get_game_file(self) -> bool:
+    def run(self):
+        options = {
+            "1": "Load Game",
+            "2": "Load Last Save",
+            "3": "Options",
+            "0": "Exit",
+        }
+
+        while True:
+            menu = text_display.ListMenu(
+                "Welcome to Micro Quest!", options, self.display
+            )
+            selection = menu.get_input()
+
+            match selection:
+                case "0":
+                    return
+                case "1":
+                    self.get_game_file()
+                case "2":
+                    self.load_last_save()
+                case "3":
+                    self.config_menu()
+
+    def get_game_file(self) -> None:
         """Prompt until a game file loads successfully or the user cancels."""
         while True:
             self.display.clear_terminal()
@@ -19,10 +49,11 @@ class MainMenu:
             self.display.text(f"{self.display.format("[0]", ansi_format="key")} Cancel")
             file_path = input("> ")
             if file_path == "0":
-                return False
+                return
             if self.load_game(file_path):
-                return True
-
+                self.play_game()
+                return
+            
     def load_game(self, file_path: str) -> bool:
         """Load a game and make a playable copy when the file is a template."""
         if not self.game_data.load_game_file(file_path):
@@ -40,7 +71,7 @@ class MainMenu:
 
         self.store_last_save(file_path)
         return True
-
+    
     def copy_template(self, template_path: str) -> bool:
         """Prompt for and create a new active copy of the loaded template."""
         source = Path(template_path)

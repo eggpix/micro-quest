@@ -26,7 +26,7 @@ class GameData:
 
             if not isinstance(new_data, dict):
                 self.display.text(
-                    self.display.error("Error: Game data must be a JSON object.")
+                    self.display.format("Error: Game data must be a JSON object.", ansi_format="error")
                 )
                 return False
 
@@ -35,21 +35,15 @@ class GameData:
             return True
         except FileNotFoundError:
             self.display.text(
-                self.display.error(
-                    f"Error: The file '{file_path}' was not found."
-                )
+                self.display.format(f"Error: The file '{file_path}' was not found.", ansi_format="error")
             )
         except json.JSONDecodeError:
             self.display.text(
-                self.display.error(
-                    f"Error: The file '{file_path}' contains invalid JSON."
-                )
+                self.display.format(f"Error: The file '{file_path}' contains invalid JSON.", ansi_format="error")
             )
         except OSError as error:
             self.display.text(
-                self.display.error(
-                    f"Error: Could not read file '{file_path}': {error}"
-                )
+                self.display.format(f"Error: Could not read file '{file_path}': {error}", ansi_format="error")
             )
 
         return False
@@ -58,7 +52,7 @@ class GameData:
         """Save game data to its currently loaded file."""
         if self.data is None or self.data_path is None:
             self.display.text(
-                self.display.error("Error: No game data loaded to save.")
+                self.display.format("Error: No game data loaded to save.", ansi_format="error")
             )
             return False
 
@@ -67,17 +61,13 @@ class GameData:
                 json.dump(self.data, file, indent=4)
             return True
         except (OSError, TypeError, ValueError) as error:
-            self.display.text(
-                self.display.error(f"Error: Could not save game data: {error}")
-            )
+            self.display.text(self.display.format(f"Error: Could not save game data: {error}", ansi_format="error"))
             return False
 
     def copy_game_file(self, file_path: str) -> bool:
         """Create a new game file without overwriting an existing file."""
         if self.data is None:
-            self.display.text(
-                self.display.error("Error: No game data loaded to save.")
-            )
+            self.display.text(self.display.format("Error: No game data loaded to save.", ansi_format="error"))
             return False
 
         try:
@@ -87,8 +77,6 @@ class GameData:
             return True
         except (OSError, TypeError, ValueError) as error:
             self.display.text(
-                self.display.error(
-                    f"Error: Could not create game file '{file_path}': {error}"
-                )
+                self.display.format(f"Error: Could not create game file '{file_path}': {error}", ansi_format="error")
             )
             return False

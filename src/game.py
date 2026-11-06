@@ -20,7 +20,7 @@ class Game:
         self.config.load_config()
         self.display.config = self.config.data
         self.game_data = game_data.GameData(self.display)
-        self.main_menu = main_menu.MainMenu(self)
+        self.main_menu = main_menu.MainMenu(self.display, self.config, self.game_data, self.await_input, self.play_game)
 
     def await_input(self) -> None:
         """Pause until the player presses Enter."""
@@ -641,24 +641,4 @@ class Game:
                 self.play_game()
             return
 
-        primary_options = {
-            "1": "Load Game",
-            "2": "Load Last Save",
-            "3": "Options",
-            "0": "Exit",
-        }
-        while True:
-            primary_menu = text_display.ListMenu(
-                "Welcome to Micro Quest!", primary_options, self.display
-            )
-            selection = primary_menu.get_input()
-            match selection:
-                case "0":
-                    return
-                case "1":
-                    if self.get_game_file():
-                        self.play_game()
-                case "2":
-                    self.load_last_save()
-                case "3":
-                    self.config_menu()
+        self.main_menu.run()

@@ -101,25 +101,59 @@ class Game:
         room_position = player_data["room_position"]
         return data.get("regions").get(region).get("rooms").get(f"{room_position[0]},{room_position[1]}")
 
-    def check_conditions(self, condition_parent: dict) -> bool:
-        data = self.game_data.data
-        player_data = data.get("player")
-        conditions = condition_parent.get("conditions", [])
+    @staticmethod
+    def get_data_path(target: str) -> list[str] | None:
+        """Convert a dotted target into a path in the game data."""
+        path = target.split(".")
+        if path[0] == "world" and len(path) > 1:
+            path = ["attributes", *path[1:]]
+        if len(path) < 2 or any(not part for part in path):
+            return None
+        return path
+
+    def get_attribute_value(self, target: str) -> tuple[bool, object]:
+        """Resolve a dotted game-data path, including the world alias."""
+        path = self.get_data_path(target)
+        if path is None:
+            return False, None
+        value = self.game_data.data
+        for key in path:
+            if not isinstance(value, dict) or key not in value:
+                return False, None
+            value = value[key]
+        return True, value
+
+    def conditions_met(self, conditions: list[dict]) -> bool:
+        """Evaluate all supported conditions; every condition must pass."""
+        player_data = self.game_data.data.get("player")
         player_inventory = player_data.get("inventory") or {}
         for condition in conditions:
             condition_type = condition.get("type")
             match condition_type:
                 case "has_item":
                     condition_item = condition.get("item")
-                    if condition_item is None:
-                        return True
-                    if condition_item not in player_inventory:
-                        failure = condition_parent.get("failure")
-                        if failure:
-                            failure_dialogue = failure.get("message")
-                            if failure_dialogue:
-                                self.loop_dialogue(failure_dialogue)
+                    if condition_item is not None and condition_item not in player_inventory:
                         return False
+                case "attribute_equals":
+                    attribute = condition.get("attribute")
+                    if not isinstance(attribute, str):
+                        return False
+                    found, actual_value = self.get_attribute_value(attribute)
+                    if not found or actual_value != condition.get("value"):
+                        return False
+                case _:
+                    return False
+
+        return True
+
+    def check_conditions(self, condition_parent: dict) -> bool:
+        """Evaluate conditions and run their associated messages and events."""
+        if not self.conditions_met(condition_parent.get("conditions", [])):
+            failure = condition_parent.get("failure")
+            failure_dialogue = failure.get("message") if failure else None
+            if failure_dialogue:
+                self.loop_dialogue(failure_dialogue)
+            return False
 
         success = condition_parent.get("success")
         if success:
@@ -127,7 +161,13 @@ class Game:
             if success_dialogue:
                 self.loop_dialogue(success_dialogue)
 
-        events = condition_parent.get("events")
+        self.apply_events(condition_parent.get("events"))
+        return True
+
+    def apply_events(self, events: dict | list[dict] | None) -> None:
+        """Apply game events shared by connections and entity interactions."""
+        data = self.game_data.data
+        player_data = data.get("player")
         if events:
             if isinstance(events, dict):
                 events = [events]
@@ -136,9 +176,26 @@ class Game:
                     case "remove_item":
                         event_item = event.get("item")
                         if event_item:
-                            player_inventory.pop(event_item, None)
+                            player_data.setdefault("inventory", {}).pop(
+                                event_item, None
+                            )
+                    case "set_attribute":
+                        target = event.get("target")
+                        if not isinstance(target, str) or not target:
+                            continue
 
-        return True
+                        path = self.get_data_path(target)
+                        if path is None:
+                            continue
+
+                        value = data
+                        for key in path[:-1]:
+                            child = value.get(key)
+                            if not isinstance(child, dict):
+                                child = {}
+                                value[key] = child
+                            value = child
+                        value[path[-1]] = event.get("value")
 
     def move_conditions(self, direction: str) -> bool:
         room_data = self.get_room_data()
@@ -273,6 +330,7 @@ class Game:
                     f"{interaction.get('name') or 'Interaction'} has no response."
                 )
                 self.await_input()
+            self.apply_events(interaction.get("events"))
             return
 
         if not is_collectable:

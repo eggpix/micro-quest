@@ -42,7 +42,14 @@
                 },
                 "ring": {
                     "name": "Ring",
-                    "message": "The bell rings loudly, echoing through the room."
+                    "message": "The bell rings loudly, echoing through the room.",
+                    "events": [
+                        {
+                            "type": "set_attribute",
+                            "target": "world.bell_rung",
+                            "value": true
+                        }
+                    ]
                 }
             }
         },
@@ -56,5 +63,8 @@
                 }
             }
         }
+    },
+    "attributes": {
+        "bell_rung": false
     }
 }

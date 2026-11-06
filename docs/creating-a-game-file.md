@@ -261,7 +261,12 @@ Interactions do not pick up or remove the entity. For example:
         },
         "ring": {
             "name": "Ring",
-            "message": "The bell rings loudly."
+            "message": "The bell rings loudly.",
+            "events": {
+                "type": "set_attribute",
+                "target": "world.bell_rung",
+                "value": true
+            }
         }
     }
 }
@@ -271,6 +276,16 @@ An entity with `"item": false` cannot be picked up, even if it is also marked
 `"collectable": true`. Entities with interactions are presented as interactable
 in the room-item menu. If an interactable entity is also collectable, its
 interaction menu includes a separate **Pick up** choice.
+
+An interaction may include `"events"` to change game state after its message
+is shown. Events use the same event system as room connections and can be
+written as one object or a list of objects:
+
+- `"remove_item"` removes the named `"item"` from the player's inventory.
+- `"set_attribute"` assigns `"value"` to the dotted `"target"` path. Use
+  `"world.attribute_name"` to set a member of the root `"attributes"` object;
+  for example, `"world.bell_rung"` updates
+  `"attributes": {"bell_rung": ...}`.
 
 ## 5. Connect Rooms
 
@@ -294,6 +309,11 @@ room must exist for the exit to be offered.
                 {
                     "type": "has_item",
                     "item": "iron_key"
+                },
+                {
+                    "type": "attribute_equals",
+                    "attribute": "world.bell_rung",
+                    "value": true
                 }
             ],
             "success": {
@@ -311,11 +331,18 @@ room must exist for the exit to be offered.
 }
 ```
 
-When a player tries to use this exit, every listed `has_item` condition must
-pass. The failure message is shown if a required item is missing; otherwise,
-the success message is shown and the event removes the key from the player's
-inventory. Events can be one object or a list of objects. The currently
-supported event is `"remove_item"`, which removes the specified item.
+Every condition in the `"conditions"` list must pass. Supported conditions are:
+
+- `"has_item"` — `"item"` must be present in the player's inventory.
+- `"attribute_equals"` — the game-data path in `"attribute"` must exist and
+  equal `"value"`. Use `"world.attribute_name"` to read a member of the root
+  `"attributes"` object, such as the value set by the bell interaction above.
+
+If a condition fails, the `"failure"` message is shown and the player does not
+move. If all conditions pass, the `"success"` message is shown and events run.
+Events can be one object or a list of objects. The currently supported
+`"remove_item"` event removes the specified item from the player's inventory;
+`"set_attribute"` assigns `"value"` to the dotted `"target"` path.
 
 `"success"` can be used without conditions. Set `"repeat_condition": false`
 and start `"condition_executed"` as `false` to run the connection's checks,

@@ -297,9 +297,14 @@ members default to the current region and the adjacent room in that direction.
 Connections can also include `"conditions"`, `"success"`, `"failure"`, and
 `"events"` members. A cross-region exit appears in the movement menu with its
 destination region's name (or its key when no name is set). The destination
-room must exist for the exit to be offered.
+room must exist for the exit to be offered. Add `"show_in_map": true` to show
+the connection as a square next to the current room on the map, even if there
+is no room at that adjacent coordinate. An optional `"map_color"` colors that
+square using a six-digit hex value in `"#RRGGBB"` format. The color is rendered
+as an ANSI 24-bit background color; terminals without truecolor support may
+display it differently, and disabling text formatting removes it.
 
-> **Note:** Connections override default movement behavior. If a room is placed in the `up` direction but a connection overrides it and transports to another region, that room is inaccessible unless another path to it exists. It is recomended not to overlap rooms with connections to regions to avoid player confusion. (If moving left transports to another region, don't put a room to the left.)
+> **Note:** Connections override default movement behavior. If a room is placed in the `up` direction but a connection overrides it and transports to another region, that room is inaccessible unless another path to it exists. It is recomended not to overlap rooms with connections to regions to avoid player confusion. (If moving left transports to another region, don't put a room to the left.) This is done to avoid conflicting with the `"show_in_map"` member, which is recommended in most games.
 
 ```json
 "3,-1": {
@@ -307,6 +312,8 @@ room must exist for the exit to be offered.
         "up": {
             "region": "courtyard",
             "room_position": [0, 0],
+            "show_in_map": true,
+            "map_color": "#12ABEF",
             "conditions": [
                 {
                     "type": "has_item",

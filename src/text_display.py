@@ -46,6 +46,20 @@ class TextDisplay:
         """Return text styled as dim background grid for maps."""
         return f"\x1B[2m{text}\x1B[0m"
 
+    def color_background(self, text: str, color: object) -> str:
+        """Return text with an ANSI 24-bit background color."""
+        if (
+            not isinstance(color, str)
+            or re.fullmatch(r"#[0-9a-fA-F]{6}", color) is None
+        ):
+            raise ValueError("Expected a six-digit hex color such as '#12ABEF'.")
+
+        red, green, blue = (
+            int(color[index:index + 2], 16)
+            for index in (1, 3, 5)
+        )
+        return f"\x1B[48;2;{red};{green};{blue}m{text}\x1B[0m"
+
     def remove_formatting(self, text: str) -> str:
         """Remove ANSI escape sequences from text."""
         return self.ANSI_ESCAPE.sub("", text)

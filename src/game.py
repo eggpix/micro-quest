@@ -72,6 +72,30 @@ class Game:
         player_data = self.game_data.data.get("player")
         room_position = player_data["room_position"]
         rooms = self.get_player_region()["rooms"]
+        connection_offsets: dict[str, tuple[int, int]] = {
+            "up": (0, -1),
+            "down": (0, 1),
+            "left": (-1, 0),
+            "right": (1, 0),
+        }
+        map_connections: dict[tuple[int, int], tuple[str, object, bool]] = {}
+        map_errors: list[str] = []
+
+        for direction, connection in (
+            self.get_room_data().get("connections") or {}
+        ).items():
+            if connection.get("show_in_map") is True:
+                offset = connection_offsets.get(direction)
+                if offset is not None:
+                    position = (
+                        room_position[0] + offset[0],
+                        room_position[1] + offset[1],
+                    )
+                    map_connections[position] = (
+                        direction,
+                        connection.get("map_color"),
+                        "map_color" in connection,
+                    )
 
         map_str = ""
 
@@ -83,14 +107,32 @@ class Game:
                 room_position[0] - MAP_SIZE // 2,
                 room_position[0] + MAP_SIZE // 2 + 1
             ):
+                position = (x, y)
                 if [x, y] == room_position:
                     map_str += "[x]"
+                elif position in map_connections:
+                    direction, color, has_color = map_connections[position]
+                    cell = "[ ]"
+                    if has_color:
+                        try:
+                            cell = self.display.color_background(cell, color)
+                        except ValueError as error:
+                            map_errors.append(
+                                self.display.error(
+                                    f"Error: Invalid map_color for the "
+                                    f"{direction} connection: {error}"
+                                )
+                            )
+                    map_str += cell
                 elif f"{x},{y}" in rooms:
                     map_str += "[ ]"
                 else:
                     map_str += self.display.grid(" . ")
 
             map_str += "\n"
+
+        if map_errors:
+            map_str += "\n".join(map_errors) + "\n"
 
         return map_str
 

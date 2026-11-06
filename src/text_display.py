@@ -36,7 +36,7 @@ class TextDisplay:
         )
         return format(f"\x1B[38;2;{red};{green};{blue}m{text}\x1B[0m")
 
-    def remove_formatting(self, text: str) -> str:
+    def _remove_formatting(self, text: str) -> str:
         """Remove ANSI escape sequences from text."""
         return self.ANSI_ESCAPE.sub("", text)
 
@@ -122,7 +122,7 @@ class TextDisplay:
                 text = f"\x1B[2m{text}\x1B[0m"
 
         if not self.config["text_formatting"]:
-            text = self.remove_formatting(text)
+            text = self._remove_formatting(text)
 
         if self.config["wrap_text"]:
             width = max(1, shutil.get_terminal_size().columns)

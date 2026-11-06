@@ -1,5 +1,7 @@
 """Handle game world"""
 
+import text_display
+
 # MAP SIZE centered on player position, must be an odd number
 MAP_SIZE = 7
 

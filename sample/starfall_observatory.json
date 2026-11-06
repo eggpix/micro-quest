@@ -203,6 +203,13 @@
                         "oil_can"
                     ],
                     "connections": {
+                        "up": {
+                            "region": "glasshouse",
+                            "room_position": [
+                                0,
+                                0
+                            ]
+                        },
                         "down": {
                             "region": "underworks",
                             "room_position": [
@@ -224,7 +231,16 @@
                     "items": [
                         "clockwork_note",
                         "minute_hand"
-                    ]
+                    ],
+                    "connections": {
+                        "up": {
+                            "region": "underworks",
+                            "room_position": [
+                                0,
+                                0
+                            ]
+                        }
+                    }
                 },
                 "1,0": {
                     "message": {

@@ -1,6 +1,5 @@
 {
     "note": "This is an AI-generated sample project for testing.",
-    
     "title": "The Last Light of Greyhaven",
     "description": "Explore a fading harbor, uncover the lighthouse keeper's secret, and restore the beacon before another ship is lost.",
     "status": "active",
@@ -9,10 +8,12 @@
         "name": "Jane",
         "region": "harbor",
         "room_position": [
-            0,
-            0
+            1,
+            -2
         ],
-        "inventory": {}
+        "inventory": {
+            "blue_lens": 1
+        }
     },
     "regions": {
         "harbor": {
@@ -21,7 +22,7 @@
                 "0,0": {
                     "message": {
                         "repeat": false,
-                        "played": false,
+                        "played": true,
                         "text": [
                             "Welcome to Greyhaven, {player.name}.",
                             "You stand in the old harbor square, where fishing boats once crowded the water.",
@@ -138,7 +139,7 @@
                 "0,-1": {
                     "message": {
                         "repeat": false,
-                        "played": false,
+                        "played": true,
                         "text": [
                             "You follow a sloping path south of the square.",
                             "The path descends toward the low-tide shoreline.",
@@ -150,7 +151,7 @@
                 "0,-2": {
                     "message": {
                         "repeat": false,
-                        "played": false,
+                        "played": true,
                         "text": [
                             "The path ends at a stretch of dark shingle beach.",
                             "Pieces of driftwood lie scattered among the stones.",
@@ -162,7 +163,7 @@
                 "1,-2": {
                     "message": {
                         "repeat": false,
-                        "played": false,
+                        "played": true,
                         "text": [
                             "You discover the remains of a small wreck beside the seawall.",
                             "Most of the vessel has been reduced to splintered wood.",
@@ -170,9 +171,7 @@
                             "You carefully take the blue lens. It may help you see through the dark passages below the cliffs."
                         ]
                     },
-                    "items": [
-                        "blue_lens"
-                    ]
+                    "items": []
                 },
                 "2,-2": {
                     "message": {
@@ -217,7 +216,7 @@
                             "An old boat shed stands between the square and the beach.",
                             "A single rowboat rests upside down on wooden supports.",
                             "Inside the shed, a charcoal sketch shows a tunnel beneath the lighthouse cliffs.",
-                            "The sketch is labelled: 'Keeper's route — use only at low tide.'"
+                            "The sketch is labelled: 'Keeper's route \u2014 use only at low tide.'"
                         ]
                     }
                 },

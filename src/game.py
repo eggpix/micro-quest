@@ -344,22 +344,59 @@ class Game:
             self.await_input()
 
 
-        def view_inventory():
-            self.display.clear_terminal()
-            self.display.text("Inventory:")
+        def view_inventory() -> None:
+            inventory = data.get("player").get("inventory")
+            entities = data.get("entities", {})
+            inventory_items = list(inventory.items())
 
-            for item, quantity in data.get("player").get("inventory").items():
-                entity_name = data.get("entities", {}).get(item, {}).get("name") or item
-                self.display.text(f"{quantity}x {entity_name}")
+            options = {}
+            for index, (item, quantity) in enumerate(inventory_items):
+                entity_name = entities.get(item, {}).get("name") or item
+                options[str(index + 1)] = f"{quantity}x {entity_name}"
+            options["0"] = "Back"
 
+            item_menu = text_display.ListMenu(
+                "Select an item or return to menu:", options, self.display
+            )
+            selection = item_menu.get_input()
+            if selection == "0":
+                return
+
+            item, _ = inventory_items[int(selection) - 1]
+            entity = entities.get(item, {})
+            room_data = self.get_room_data()
+            can_drop = not (
+                entity.get("droppable", True) is False
+                or room_data.get("contain_items", True) is False
+            )
+
+            item_name = entity.get("name") or item
+            description = entity.get("description") or (
+                "No additional information for this item."
+            )
+            item_options = {}
+            if can_drop:
+                item_options["1"] = "Drop one"
+            item_options["0"] = "Back"
+            drop_selection = text_display.ListMenu(
+                f"{item_name}\n{description}", item_options, self.display
+            ).get_input()
+            if drop_selection == "0":
+                return
+
+            room_data.setdefault("items", []).append(item)
+            if inventory[item] == 1:
+                del inventory[item]
+            else:
+                inventory[item] -= 1
+            self.display.text(f"You dropped {entity.get('name') or item}.")
             self.await_input()
-
 
         while True:
             self.display.clear_terminal()
 
             player_has_inventory = bool(data.get("player").get("inventory"))
-            room_items = self.get_room_items()
+            room_items = self.get_room_items() 
 
             index = 2
 

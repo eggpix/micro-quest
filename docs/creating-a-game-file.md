@@ -208,7 +208,10 @@ to `true` to let the player pick it up from the room's item menu.
 
 Items without `"collectable": true` remain in the room and cannot be picked
 up. Collected items are removed from the room and added to the player's
-`"inventory"`.
+`"inventory"`. An entity may also have a `"description"` member, shown when
+the player selects it in their inventory. Inventory items can be dropped
+unless the entity has `"droppable": false` or the current room has
+`"contain_items": false`. Both members default to `true` when omitted.
 
 ## 5. Connect Rooms
 

@@ -1,75 +1,107 @@
-"""Handle game world"""
+"""World navigation and map operations for Micro Quest."""
 
+from collections.abc import Callable
+from typing import Any
+
+import game_data
 import text_display
 
-# MAP SIZE centered on player position, must be an odd number
+# An odd map size keeps the player's room centered.
 MAP_SIZE = 7
 
+CONNECTION_OFFSETS: dict[str, tuple[int, int]] = {
+    "up": (0, -1),
+    "down": (0, 1),
+    "left": (-1, 0),
+    "right": (1, 0),
+}
+
+DIRECTIONS: dict[str, tuple[str, tuple[int, int]]] = {
+    "W": ("up", (0, -1)),
+    "A": ("left", (-1, 0)),
+    "S": ("down", (0, 1)),
+    "D": ("right", (1, 0)),
+}
+
+ConditionChecker = Callable[[dict[str, Any]], bool]
+RoomEntryHandler = Callable[[], None]
+
+
 class World:
-    """Handle game world"""
-    def __init__(self, game_data, display):
-        self.game_data = game_data
+    """Provide map, room, and movement operations for the current game."""
+
+    def __init__(
+        self,
+        game_data_manager: game_data.GameData,
+        display: text_display.TextDisplay,
+    ) -> None:
+        self.game_data = game_data_manager
         self.display = display
 
-    def get_player_region(self) -> dict:
-            data = self.game_data.data
-            region = data.get("player").get("region")
-            return data.get("regions").get(region)
+    @property
+    def data(self) -> dict[str, Any]:
+        """Return loaded game data, raising a clear error if none is loaded."""
+        if self.game_data.data is None:
+            raise RuntimeError("No game data is loaded.")
+        return self.game_data.data
+
+    def get_player_region(self) -> dict[str, Any]:
+        """Return the region the player currently occupies."""
+        player = self.data.get("player", {})
+        return self.data.get("regions", {}).get(player.get("region"), {})
 
     def get_region_string(self) -> str:
-        return self.get_player_region().get("name") or self.game_data.data.get("player").get("region")
+        """Return the current region's display name or its identifier."""
+        player = self.data.get("player", {})
+        region_id = player.get("region")
+        return self.get_player_region().get("name") or region_id
 
     def get_map(self) -> str:
-        player_data = self.game_data.data.get("player")
-        room_position = player_data["room_position"]
-        rooms = self.get_player_region()["rooms"]
-        connection_offsets: dict[str, tuple[int, int]] = {
-            "up": (0, -1),
-            "down": (0, 1),
-            "left": (-1, 0),
-            "right": (1, 0),
-        }
-        map_connections: dict[tuple[int, int], tuple[str, object, bool]] = {}
-        map_errors: list[str] = []
+        """Render the rooms and visible connections around the player."""
+        player = self.data.get("player", {})
+        room_position = player["room_position"]
+        rooms = self.get_player_region().get("rooms", {})
 
         map_left = room_position[0] - MAP_SIZE // 2
         map_right = room_position[0] + MAP_SIZE // 2
         map_top = room_position[1] - MAP_SIZE // 2
         map_bottom = room_position[1] + MAP_SIZE // 2
 
+        map_connections: dict[
+            tuple[int, int], tuple[str, Any, bool]
+        ] = {}
+        map_errors: list[str] = []
+
         for y in range(map_top - 1, map_bottom + 2):
             for x in range(map_left - 1, map_right + 2):
                 source_room = rooms.get(f"{x},{y}", {})
-                for direction, connection in (
-                    source_room.get("connections") or {}
-                ).items():
-                    if connection.get("show_in_map") is True:
-                        offset = connection_offsets.get(direction)
-                        if offset is not None:
-                            position = (x + offset[0], y + offset[1])
-                            if (
-                                map_left <= position[0] <= map_right
-                                and map_top <= position[1] <= map_bottom
-                            ):
-                                map_connections[position] = (
-                                    direction,
-                                    connection.get("map_color"),
-                                    "map_color" in connection,
-                                )
+                connections = source_room.get("connections") or {}
+                for direction, connection in connections.items():
+                    if connection.get("show_in_map") is not True:
+                        continue
 
-        map_str = ""
+                    offset = CONNECTION_OFFSETS.get(direction)
+                    if offset is None:
+                        continue
 
-        for y in range(
-            room_position[1] - MAP_SIZE // 2,
-            room_position[1] + MAP_SIZE // 2 + 1
-        ):
-            for x in range(
-                room_position[0] - MAP_SIZE // 2,
-                room_position[0] + MAP_SIZE // 2 + 1
-            ):
+                    position = (x + offset[0], y + offset[1])
+                    if (
+                        map_left <= position[0] <= map_right
+                        and map_top <= position[1] <= map_bottom
+                    ):
+                        map_connections[position] = (
+                            direction,
+                            connection.get("map_color"),
+                            "map_color" in connection,
+                        )
+
+        rows: list[str] = []
+        for y in range(map_top, map_bottom + 1):
+            cells: list[str] = []
+            for x in range(map_left, map_right + 1):
                 position = (x, y)
                 if [x, y] == room_position:
-                    map_str += "[x]"
+                    cells.append("[x]")
                 elif position in map_connections:
                     direction, color, has_color = map_connections[position]
                     cell = "[ ]"
@@ -83,67 +115,77 @@ class World:
                         except ValueError as error:
                             map_errors.append(
                                 self.display.format(
-                                    f"Error: Invalid map_color for the "
+                                    "Error: Invalid map_color for the "
                                     f"{direction} connection: {error}",
-                                    ansi_format="error"
+                                    ansi_format="error",
                                 )
                             )
-                    map_str += cell
+                    cells.append(cell)
                 elif f"{x},{y}" in rooms:
-                    map_str += "[ ]"
+                    cells.append("[ ]")
                 else:
-                    map_str += self.display.format(" . ", ansi_format="grid")
+                    cells.append(
+                        self.display.format(" . ", ansi_format="grid")
+                    )
 
-            map_str += "\n"
+            rows.append("".join(cells))
 
+        map_text = "\n".join(rows) + "\n"
         if map_errors:
-            map_str += "\n".join(map_errors) + "\n"
+            map_text += "\n".join(map_errors) + "\n"
+        return map_text
 
-        return map_str
+    def get_room_data(self) -> dict[str, Any]:
+        """Return the room at the player's current region and position."""
+        player = self.data.get("player", {})
+        region_id = player["region"]
+        x, y = player["room_position"]
+        return (
+            self.data.get("regions", {})
+            .get(region_id, {})
+            .get("rooms", {})
+            .get(f"{x},{y}", {})
+        )
 
-    def get_room_data(self) -> dict:
-        data = self.game_data.data
-        player_data = data.get("player")
-        region = player_data["region"]
-        room_position = player_data["room_position"]
-        return data.get("regions").get(region).get("rooms").get(f"{room_position[0]},{room_position[1]}")
+    def move_conditions(
+        self,
+        direction: str,
+        check_conditions: ConditionChecker,
+    ) -> bool:
+        """Check any condition or event attached to an exit before moving."""
+        connections = self.get_room_data().get("connections") or {}
+        connection = connections.get(direction, {})
+        has_connection_actions = bool(
+            connection.get("conditions")
+            or connection.get("success")
+            or connection.get("events")
+        )
+        if not has_connection_actions:
+            return True
 
-    def move_conditions(self, direction: str) -> bool:
-        room_data = self.get_room_data()
-        connections = room_data.get("connections")
+        repeat_condition = connection.get("repeat_condition", True)
+        if not repeat_condition and connection.get("condition_executed", False):
+            return True
 
-        if connections:
-            connection = connections.get(direction, {})
-            conditions = connection.get("conditions")
-            has_connection_actions = bool(
-                conditions or connection.get("success") or connection.get("events")
-            )
-            if not has_connection_actions:
-                return True
+        if not check_conditions(connection):
+            return False
 
-            if (
-                not connection.get("repeat_condition", True)
-                and connection.get("condition_executed", False)
-            ):
-                return True
-
-            if not self.check_conditions(connection):
-                return False
-
-            if not connection.get("repeat_condition", True):
-                connection["condition_executed"] = True
-
+        if not repeat_condition:
+            connection["condition_executed"] = True
         return True
 
     def get_connection_destination(
-        self, direction: str, offset: tuple[int, int]
+        self,
+        direction: str,
+        offset: tuple[int, int],
     ) -> tuple[str, list[int]]:
-        """Return a connection"s explicit destination or its adjacent room."""
-        player_data = self.game_data.data.get("player")
-        connections = self.get_room_data().get("connections") or {}
-        connection = connections.get(direction, {})
-        current_position = player_data["room_position"]
-        destination_region = connection.get("region", player_data["region"])
+        """Return an exit's explicit destination or its adjacent room."""
+        player = self.data.get("player", {})
+        connection = (
+            self.get_room_data().get("connections") or {}
+        ).get(direction, {})
+        current_position = player["room_position"]
+        destination_region = connection.get("region", player["region"])
         destination_position = connection.get("room_position")
 
         if destination_position is None:
@@ -155,76 +197,72 @@ class World:
         return destination_region, destination_position
 
     def get_room_items(self) -> list[str]:
-        room_data = self.get_room_data()
-        return room_data.get("items", [])
+        """Return the item identifiers in the current room."""
+        return self.get_room_data().get("items", [])
 
-    def player_move(self) -> None:
-        player_data = self.game_data.data.get("player")
-        room_position = player_data["room_position"]
-        rooms = self.get_player_region()["rooms"]
+    def player_move(
+        self,
+        check_conditions: ConditionChecker,
+        enter_room: RoomEntryHandler,
+    ) -> None:
+        """Prompt for a valid exit and move the player when allowed."""
+        player = self.data.get("player", {})
+        room_position = player["room_position"]
+        rooms = self.get_player_region().get("rooms", {})
+        current_room = rooms.get(f"{room_position[0]},{room_position[1]}", {})
+        blocked_directions = current_room.get("block", [])
 
-        directions = {
-            "W": ("Up", (0, -1)),
-            "A": ("Left", (-1, 0)),
-            "S": ("Down", (0, 1)),
-            "D": ("Right", (1, 0))
-        }
-
-        direction_options = {}
-
-        for key, (label, offset) in directions.items():
-            current_room = rooms.get(f"{room_position[0]},{room_position[1]}", {})
-            blocked_directions = current_room.get("block", [])
-            if label.lower() in blocked_directions:
+        direction_options: dict[str, str] = {}
+        for key, (label, offset) in DIRECTIONS.items():
+            if label in blocked_directions:
                 continue
 
             destination_region, destination_position = (
-                self.get_connection_destination(label.lower(), offset)
+                self.get_connection_destination(label, offset)
             )
             destination_rooms = (
-                self.game_data.data.get("regions", {})
+                self.data.get("regions", {})
                 .get(destination_region, {})
                 .get("rooms", {})
             )
-            if (
+            destination_key = (
                 f"{destination_position[0]},{destination_position[1]}"
-                in destination_rooms
-            ):
-                if destination_region != player_data["region"]:
-                    destination_name = (
-                        self.game_data.data.get("regions", {})
-                        .get(destination_region, {})
-                        .get("name")
-                        or destination_region
-                    )
-                    label = f"{label} (To {destination_name})"
-                direction_options[key] = label
+            )
+            if destination_key not in destination_rooms:
+                continue
+
+            if destination_region != player["region"]:
+                destination_name = (
+                    self.data.get("regions", {})
+                    .get(destination_region, {})
+                    .get("name")
+                    or destination_region
+                )
+                label = f"{label.title()} (To {destination_name})"
+            else:
+                label = label.title()
+            direction_options[key] = label
 
         direction_options["0"] = "Cancel"
-
         self.display.clear_terminal()
 
-        direction_menu = text_display.ListMenu(
+        menu = text_display.ListMenu(
             "Choose a Direction to Move:",
             direction_options,
             self.display,
-            description=self.get_map()
+            description=self.get_map(),
         )
-
-        dir_selection = direction_menu.get_input().upper()
-
-        if dir_selection == "0":
+        selection = menu.get_input().upper()
+        if selection == "0":
             return
 
-        # Check conditions before entering
-        if self.move_conditions(directions[dir_selection][0].lower()):
-            direction = directions[dir_selection][0].lower()
-            destination_region, destination_position = (
-                self.get_connection_destination(
-                    direction, directions[dir_selection][1]
-                )
-            )
-            player_data["region"] = destination_region
-            player_data["room_position"] = destination_position
+        direction, offset = DIRECTIONS[selection]
+        if not self.move_conditions(direction, check_conditions):
+            return
 
-            self.enter_room()
+        destination_region, destination_position = (
+            self.get_connection_destination(direction, offset)
+        )
+        player["region"] = destination_region
+        player["room_position"] = destination_position
+        enter_room()

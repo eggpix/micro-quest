@@ -1,12 +1,13 @@
 """Application flow for Micro Quest."""
 
+import re
+
 import config
 import game_data
-import text_display
 import main_menu
+import text_display
 import world
 
-import re
 
 class Game:
     """Coordinate menus, game data, configuration, and play."""
@@ -18,7 +19,13 @@ class Game:
         self.config.load_config()
         self.display.config = self.config.data
         self.game_data = game_data.GameData(self.display)
-        self.main_menu = main_menu.MainMenu(self.display, self.config, self.game_data, self.await_input, self.play_game)
+        self.main_menu = main_menu.MainMenu(
+            self.display,
+            self.config,
+            self.game_data,
+            self.await_input,
+            self.play_game,
+        )
         self.world = world.World(self.game_data, self.display)
 
     def await_input(self) -> None:
@@ -287,6 +294,10 @@ class Game:
             self.game_data.data["completed"] = True
             self.game_data.save_game_file()
 
+    def move_player(self) -> None:
+        """Coordinate exit checks and room entry with the world navigator."""
+        self.world.player_move(self.check_conditions, self.enter_room)
+
     def play_game(self) -> None:
         """Display the loaded game"s introduction and main choice menu."""
         data = self.game_data.data
@@ -381,7 +392,7 @@ class Game:
             }
 
             actions = {
-                "1": self.world.player_move,
+                "1": self.move_player,
                 "2": view_location
             }
 

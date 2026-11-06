@@ -23,7 +23,7 @@ class Game:
 
     def await_input(self) -> None:
         """Pause until the player presses Enter."""
-        input(f"{self.display.key('[Enter]')} to continue... ")
+        input(f"{self.display.format("[Enter]", ansi_format="key")} to continue... ")
 
     def get_player_region(self) -> dict:
         data = self.game_data.data
@@ -131,16 +131,17 @@ class Game:
                             )
                         except ValueError as error:
                             map_errors.append(
-                                self.display.error(
+                                self.display.format(
                                     f"Error: Invalid map_color for the "
-                                    f"{direction} connection: {error}"
+                                    f"{direction} connection: {error}",
+                                    ansi_format="error"
                                 )
                             )
                     map_str += cell
                 elif f"{x},{y}" in rooms:
                     map_str += "[ ]"
                 else:
-                    map_str += self.display.grid(" . ")
+                    map_str += self.display.format(" . ", ansi_format="grid")
 
             map_str += "\n"
 
@@ -282,7 +283,7 @@ class Game:
     def get_connection_destination(
         self, direction: str, offset: tuple[int, int]
     ) -> tuple[str, list[int]]:
-        """Return a connection's explicit destination or its adjacent room."""
+        """Return a connection"s explicit destination or its adjacent room."""
         player_data = self.game_data.data.get("player")
         connections = self.get_room_data().get("connections") or {}
         connection = connections.get(direction, {})
@@ -382,27 +383,27 @@ class Game:
                 self.loop_dialogue(message)
             else:
                 self.display.text(
-                    f"{interaction.get('name') or 'Interaction'} has no response."
+                    f"{interaction.get("name") or "Interaction"} has no response."
                 )
                 self.await_input()
             self.apply_events(interaction.get("events"))
             return
 
         if not is_collectable:
-            self.display.text(f"You cannot pick up {entity.get('name') or item}.")
+            self.display.text(f"You cannot pick up {entity.get("name") or item}.")
             self.await_input()
             return
 
         self.collect_room_item(index, item, entity)
 
     def collect_room_item(self, index: int, item: str, entity: dict) -> None:
-        """Move one collectable room item into the player's inventory."""
+        """Move one collectable room item into the player"s inventory."""
         data = self.game_data.data
         room_items = self.get_room_items()
         inventory = data.get("player").setdefault("inventory", {})
         inventory[item] = inventory.get(item, 0) + 1
         room_items.pop(index)
-        self.display.text(f"You picked up {entity.get('name') or item}.")
+        self.display.text(f"You picked up {entity.get("name") or item}.")
         self.await_input()
 
     def enter_room(self) -> None:
@@ -505,11 +506,11 @@ class Game:
             self.enter_room()
             
     def play_game(self) -> None:
-        """Display the loaded game's introduction and main choice menu."""
+        """Display the loaded game"s introduction and main choice menu."""
         data = self.game_data.data
 
         self.display.clear_terminal()
-        self.display.text(self.display.title(data.get("title") or "Untitled"))
+        self.display.text(self.display.format(data.get("title") or "Untitled", ansi_format="title"))
         self.display.text(data.get("description") or "")
         self.await_input()
 
@@ -525,7 +526,7 @@ class Game:
         def view_location():
             px, py = data.get("player").get("room_position")
             self.display.clear_terminal()
-            self.display.text(f"Current Region: {self.display.title(self.get_region_string())}")
+            self.display.text(f"Current Region: {self.display.format(self.get_region_string(), ansi_format="title")}")
             self.display.text(f"Current Room: [{px},{py}]")
             self.display.text(f"{self.get_map()}")
             self.await_input()
@@ -571,7 +572,7 @@ class Game:
 
             item_options["0"] = "Back"
             drop_selection = text_display.ListMenu(
-                item_name, item_options, self.display, description=self.display.extra(description)
+                item_name, item_options, self.display, description=self.display.format(description, ansi_format="hint")
             ).get_input()
             if drop_selection == "0":
                 return
@@ -581,7 +582,7 @@ class Game:
                 del inventory[item]
             else:
                 inventory[item] -= 1
-            self.display.text(f"You dropped {entity.get('name') or item}.")
+            self.display.text(f"You dropped {entity.get("name") or item}.")
             self.await_input()
 
         while True:
@@ -638,9 +639,9 @@ class Game:
             self.display.clear_terminal()
             self.display.text("Input the file path of your game to get started.")
             self.display.text(
-                f"Current working directory: {self.display.path(str(Path.cwd()))}"
+                f"Current working directory: {self.display.format(str(Path.cwd()), ansi_format="path")}"
             )
-            self.display.text(f"{self.display.key('[0]')} Cancel")
+            self.display.text(f"{self.display.format("[0]", ansi_format="key")} Cancel")
             file_path = input("> ")
             if file_path == "0":
                 return False
@@ -668,7 +669,7 @@ class Game:
     def copy_template(self, template_path: str) -> bool:
         """Prompt for and create a new active copy of the loaded template."""
         source = Path(template_path)
-        default_path = source.with_name(f"{source.stem}_copy{source.suffix or '.json'}")
+        default_path = source.with_name(f"{source.stem}_copy{source.suffix or ".json"}")
         while True:
             self.display.clear_terminal()
             self.display.text(
@@ -679,7 +680,7 @@ class Game:
                 "Enter a file path to create a new copy "
                 f"(default: {self.display.path(str(default_path))})."
             )
-            self.display.text(f"{self.display.key('[0]')} Cancel")
+            self.display.text(f"{self.display.format("[0]", ansi_format="key")} Cancel")
             destination = input("> ").strip()
             if destination == "0":
                 return False
@@ -687,7 +688,7 @@ class Game:
             if Path(destination).exists():
                 self.display.text(
                     "A file already exists at "
-                    f"'{self.display.path(destination)}'. Choose another path."
+                    f"'{self.display.format(destination, ansi_format="path")}'. Choose another path."
                 )
                 continue
 
@@ -708,7 +709,7 @@ class Game:
             options = {
                 key: (
                     f"{label} "
-                    f"({'Enabled' if self.config.data[name] else 'Disabled'})"
+                    f"({"Enabled" if self.config.data[name] else "Disabled"})"
                 )
                 for key, (name, label) in settings.items()
             }
@@ -730,9 +731,9 @@ class Game:
             if self.load_game(last_save_file):
                 self.display.clear_terminal()
                 self.display.text(
-                    f"Load game {self.display.path(last_save_file)}?"
+                    f"Load game {self.display.format(last_save_file, ansi_format="path")}?"
                 )
-                self.display.text(self.display.key("[Y/N]"))
+                self.display.text(self.display.format("[Y/N]", ansi_format="key"))
                 if input("> ").strip().lower() in ("y", "yes"):
                     self.play_game()
         else:

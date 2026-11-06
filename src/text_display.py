@@ -23,29 +23,6 @@ class TextDisplay:
             sys.stdout.write("\x1B[2J\x1B[H")
             sys.stdout.flush()
 
-    def title(self, text: str) -> str:
-        """Return text styled as a title."""
-        return f"\x1B[1m{text}\x1B[0m\n"
-
-    def path(self, text: str) -> str:
-        """Return text styled as a file-system path."""
-        return f"\x1B[34m{text}\x1B[0m"
-
-    def extra(self, text: str) -> str:
-        return f"\x1B[3m{text}\x1B[0m"
-
-    def key(self, text: str) -> str:
-        """Return text styled as a menu key or response prompt."""
-        return f"\x1B[36m{text}\x1B[0m"
-
-    def error(self, text: str) -> str:
-        """Return text styled as an error message."""
-        return f"\x1B[31m{text}\x1B[0m"
-
-    def grid(self, text: str) -> str:
-        """Return text styled as dim background grid for maps."""
-        return f"\x1B[2m{text}\x1B[0m"
-
     def color_foreground(self, text: str, color: object) -> str:
         """Return text with an ANSI 24-bit foreground color."""
         if (
@@ -58,14 +35,28 @@ class TextDisplay:
             int(color[index:index + 2], 16)
             for index in (1, 3, 5)
         )
-        return f"\x1B[38;2;{red};{green};{blue}m{text}\x1B[0m"
+        return format(f"\x1B[38;2;{red};{green};{blue}m{text}\x1B[0m")
 
     def remove_formatting(self, text: str) -> str:
         """Remove ANSI escape sequences from text."""
         return self.ANSI_ESCAPE.sub("", text)
 
-    def format(self, text: str) -> str:
+    def format(self, text: str, ansi_format: str | None = None) -> str:
         """Apply formatting and wrapping according to configuration."""
+        match ansi_format:
+            case "title":
+                text = f"\x1B[1m{text}\x1B[0m\n"
+            case "path":
+                text = f"\x1B[34m{text}\x1B[0m"
+            case "hint":
+                text = f"\x1B[3m{text}\x1B[0m"
+            case "key":
+                text = f"\x1B[36m{text}\x1B[0m"
+            case "error":
+                text = f"\x1B[31m{text}\x1B[0m"
+            case "grid":
+                text = f"\x1B[2m{text}\x1B[0m"
+
         if not self.config["text_formatting"]:
             text = self.remove_formatting(text)
 
@@ -80,6 +71,7 @@ class TextDisplay:
 
     def text(self, text: str) -> None:
         """Display formatted text according to configuration."""
+        
         print(self.format(text))
 
 
@@ -107,12 +99,12 @@ class ListMenu:
 
         if self.context is not None:
             self.display.text(self.context)
-        self.display.text(self.display.title(self.title))
+        self.display.text(self.display.format(self.title, "title"))
         if self.description is not None:
             self.display.text(self.description)
 
         for key, option in self.options.items():
-            self.display.text(f"{self.display.key(f'[{key}]')} {option}")
+            self.display.text(f"{self.display.format(f'[{key}]', ansi_format="key")} {option}")
 
     def get_input(self) -> str:
         """Display the menu until the user enters a valid selection."""

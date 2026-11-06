@@ -81,21 +81,30 @@ class Game:
         map_connections: dict[tuple[int, int], tuple[str, object, bool]] = {}
         map_errors: list[str] = []
 
-        for direction, connection in (
-            self.get_room_data().get("connections") or {}
-        ).items():
-            if connection.get("show_in_map") is True:
-                offset = connection_offsets.get(direction)
-                if offset is not None:
-                    position = (
-                        room_position[0] + offset[0],
-                        room_position[1] + offset[1],
-                    )
-                    map_connections[position] = (
-                        direction,
-                        connection.get("map_color"),
-                        "map_color" in connection,
-                    )
+        map_left = room_position[0] - MAP_SIZE // 2
+        map_right = room_position[0] + MAP_SIZE // 2
+        map_top = room_position[1] - MAP_SIZE // 2
+        map_bottom = room_position[1] + MAP_SIZE // 2
+
+        for y in range(map_top - 1, map_bottom + 2):
+            for x in range(map_left - 1, map_right + 2):
+                source_room = rooms.get(f"{x},{y}", {})
+                for direction, connection in (
+                    source_room.get("connections") or {}
+                ).items():
+                    if connection.get("show_in_map") is True:
+                        offset = connection_offsets.get(direction)
+                        if offset is not None:
+                            position = (x + offset[0], y + offset[1])
+                            if (
+                                map_left <= position[0] <= map_right
+                                and map_top <= position[1] <= map_bottom
+                            ):
+                                map_connections[position] = (
+                                    direction,
+                                    connection.get("map_color"),
+                                    "map_color" in connection,
+                                )
 
         map_str = ""
 

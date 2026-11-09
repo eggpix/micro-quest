@@ -349,10 +349,15 @@ Every condition in the `"conditions"` list must pass. Supported conditions are:
 
 - `"has_item"` — `"item"` must be present in the selected object's
   `"inventory"`. `"object"` is an optional dotted path to that object and
-  defaults to `"player"`; `"quantity"` is an optional minimum count and
-  defaults to `1`. For example, use
-  `{"type": "has_item", "item": "iron_key", "quantity": 2}` to require two
-  keys, or set `"object": "entities.guard"` to check that object's inventory.
+  defaults to `"player"`. `"quantity"` optionally requires an exact count;
+  `"min_quantity"` and `"max_quantity"` set inclusive bounds. The minimum
+  defaults to `1`, so the item must be present unless a higher minimum is
+  specified. For example, use
+  `{"type": "has_item", "item": "iron_key", "quantity": 2}` to require
+  exactly two keys, or combine `"min_quantity": 2` and `"max_quantity": 4`
+  to require between two and four. Counts must be positive integers, and
+  combined bounds must be consistent. Set `"object": "entities.guard"` to
+  check that object's inventory.
 - `"attribute_equals"` — the game-data path in `"attribute"` must exist and
   equal `"value"`. Use `"world.attribute_name"` to read a member of the root
   `"attributes"` object, such as the value set by the bell interaction above.

@@ -97,14 +97,32 @@ class Game:
                 case "has_item":
                     condition_item = condition.get("item")
                     condition_object = condition.get("object", "player")
-                    minimum_quantity = condition.get("quantity", 1)
+                    quantity = condition.get("quantity")
+                    min_quantity = condition.get("min_quantity", 1)
+                    max_quantity = condition.get("max_quantity", None)
                     if (
                         not isinstance(condition_item, str)
                         or not condition_item
                         or not isinstance(condition_object, str)
-                        or not isinstance(minimum_quantity, int)
-                        or isinstance(minimum_quantity, bool)
-                        or minimum_quantity < 1
+                        or not (quantity is None or isinstance(quantity, int))
+                        or isinstance(quantity, bool)
+                        or not isinstance(min_quantity, int)
+                        or isinstance(min_quantity, bool)
+                        or not (max_quantity is None or isinstance(max_quantity, int))
+                        or isinstance(max_quantity, bool)
+                        or quantity is not None
+                        and quantity < 1
+                        or min_quantity < 1
+                        or max_quantity is not None
+                        and max_quantity < 1
+                        or max_quantity is not None
+                        and min_quantity > max_quantity
+                        or quantity is not None
+                        and (
+                            quantity < min_quantity
+                            or max_quantity is not None
+                            and quantity > max_quantity
+                        )
                     ):
                         return False
 
@@ -119,7 +137,12 @@ class Game:
                     if (
                         not isinstance(item_quantity, int)
                         or isinstance(item_quantity, bool)
-                        or item_quantity < minimum_quantity
+                        or (quantity is not None and item_quantity != quantity)
+                        or item_quantity < min_quantity
+                        or (
+                            max_quantity is not None
+                            and item_quantity > max_quantity
+                        )
                     ):
                         return False
                 case "attribute_equals":

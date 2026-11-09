@@ -1,5 +1,6 @@
 """Application flow for Micro Quest."""
 
+import math
 import re
 
 import config
@@ -209,14 +210,139 @@ class Game:
                         if path is None or len(path) < 2:
                             continue
 
-                        value = data
+                        member = data
                         for key in path[:-1]:
-                            child = value.get(key)
+                            child = member.get(key)
                             if not isinstance(child, dict):
                                 child = {}
-                                value[key] = child
-                            value = child
-                        value[path[-1]] = event.get("value")
+                                member[key] = child
+                            member = child
+                        member[path[-1]] = event.get("value")
+                    case "modify_attribute":
+                        target = event.get("target")
+                        if not isinstance(target, str) or not target:
+                            self.display.text(
+                                self.display.format(
+                                    "Error: modify_attribute requires a target path.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        operation = event.get("operation")
+                        if operation not in ("+", "-", "*", "/"):
+                            self.display.text(
+                                self.display.format(
+                                    "Error: modify_attribute operation must be "
+                                    "+, -, *, or /.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        value = event.get("value")
+                        if (
+                            isinstance(value, bool)
+                            or not isinstance(value, (int, float))
+                            or isinstance(value, float)
+                            and not math.isfinite(value)
+                        ):
+                            self.display.text(
+                                self.display.format(
+                                    "Error: modify_attribute value must be a "
+                                    "finite number.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        path = self.get_data_path(target)
+                        if path is None or len(path) < 2:
+                            self.display.text(
+                                self.display.format(
+                                    f"Error: Invalid modify_attribute target '{target}'.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        member = data
+                        valid_target = True
+                        for key in path[:-1]:
+                            if not isinstance(member, dict) or key not in member:
+                                valid_target = False
+                                break
+                            member = member[key]
+
+                        if (
+                            not valid_target
+                            or not isinstance(member, dict)
+                            or path[-1] not in member
+                        ):
+                            self.display.text(
+                                self.display.format(
+                                    f"Error: modify_attribute target '{target}' "
+                                    "does not exist.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        current_value = member[path[-1]]
+                        if (
+                            isinstance(current_value, bool)
+                            or not isinstance(current_value, (int, float))
+                            or isinstance(current_value, float)
+                            and not math.isfinite(current_value)
+                        ):
+                            self.display.text(
+                                self.display.format(
+                                    f"Error: modify_attribute target '{target}' "
+                                    "must contain a finite number.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        if operation == "/" and value == 0:
+                            self.display.text(
+                                self.display.format(
+                                    "Error: modify_attribute cannot divide by zero.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        try:
+                            match operation:
+                                case "+":
+                                    result = current_value + value
+                                case "-":
+                                    result = current_value - value
+                                case "*":
+                                    result = current_value * value
+                                case "/":
+                                    result = current_value / value
+                        except ArithmeticError as error:
+                            self.display.text(
+                                self.display.format(
+                                    f"Error: Could not modify '{target}': {error}.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        if isinstance(result, float) and not math.isfinite(result):
+                            self.display.text(
+                                self.display.format(
+                                    f"Error: modify_attribute result for '{target}' "
+                                    "is not finite.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        member[path[-1]] = result
 
     def is_collectable_entity(self, entity: dict) -> bool:
         """Return whether an entity can be picked up into inventory."""

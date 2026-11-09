@@ -291,6 +291,24 @@ written as one object or a list of objects:
   `"entities.harbor_bell.attributes.rung"`, or
   `"regions.fountain.rooms.0,0.attributes.visited"`. Missing intermediate
   objects are created when the event runs.
+- `"modify_attribute"` performs arithmetic on an existing numeric value at
+  the dotted `"target"` path. `"operation"` must be `"+"`, `"-"`, `"*"`, or
+  `"/"`; `"value"` must be a finite number. For example, this event adds five
+  to the player's health:
+
+  ```json
+  {
+      "type": "modify_attribute",
+      "target": "player.attributes.health",
+      "operation": "+",
+      "value": 5
+  }
+  ```
+
+  The target must already exist and contain a finite number; unlike
+  `"set_attribute"`, this event does not create missing members. A zero value
+  is allowed except as the divisor for `"/"`. Invalid events display an error
+  and do not modify game data.
 
 ## 5. Connect Rooms
 
@@ -377,9 +395,10 @@ Every condition in the `"conditions"` list must pass. Supported conditions are:
 
 If a condition fails, the `"failure"` message is shown and the player does not
 move. If all conditions pass, the `"success"` message is shown and events run.
-Events can be one object or a list of objects. The currently supported
-`"remove_item"` event removes the specified item from the player's inventory;
-`"set_attribute"` assigns `"value"` to the dotted `"target"` path.
+Events can be one object or a list of objects. Supported event types are
+`"remove_item"` (removes the specified item from the player's inventory),
+`"set_attribute"` (assigns `"value"` to the dotted `"target"` path), and
+`"modify_attribute"` (performs arithmetic on an existing numeric target).
 
 `"success"` can be used without conditions. Set `"repeat_condition": false`
 and start `"condition_executed"` as `false` to run the connection's checks,

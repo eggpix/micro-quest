@@ -44,7 +44,7 @@ class Game:
 
             return str(value)
 
-        return re.sub(r"\{([a-zA-Z0-9_.]+)\}", replace, text)
+        return re.sub(r"\{([a-zA-Z0-9_.,]+)\}", replace, text)
 
     def loop_dialogue(self, dialogue: str | list[str]) -> None:
         if isinstance(dialogue, str):

@@ -285,7 +285,12 @@ written as one object or a list of objects:
 - `"set_attribute"` assigns `"value"` to the dotted `"target"` path. Use
   `"world.attribute_name"` to set a member of the root `"attributes"` object;
   for example, `"world.bell_rung"` updates
-  `"attributes": {"bell_rung": ...}`.
+  `"attributes": {"bell_rung": ...}`. To set an attribute on another object,
+  include that object's full path from the game-data root, such as
+  `"player.attributes.health"`,
+  `"entities.harbor_bell.attributes.rung"`, or
+  `"regions.fountain.rooms.0,0.attributes.visited"`. Missing intermediate
+  objects are created when the event runs.
 
 ## 5. Connect Rooms
 
@@ -346,6 +351,9 @@ Every condition in the `"conditions"` list must pass. Supported conditions are:
 - `"attribute_equals"` — the game-data path in `"attribute"` must exist and
   equal `"value"`. Use `"world.attribute_name"` to read a member of the root
   `"attributes"` object, such as the value set by the bell interaction above.
+  Attributes on individual objects use their full path, for example
+  `"player.attributes.health"` or
+  `"regions.fountain.rooms.0,0.attributes.visited"`.
 
 If a condition fails, the `"failure"` message is shown and the player does not
 move. If all conditions pass, the `"success"` message is shown and events run.
@@ -371,6 +379,10 @@ Use `{path.to.value}` placeholders to insert values from the game JSON. Each
 dot-separated part looks up a member, starting at the root. For example,
 `{player.name}` displays the player's name. If a placeholder cannot be
 resolved, it is left unchanged, which can help spot a typo while testing.
+The same syntax reads attributes on individual objects, such as
+`{player.attributes.health}`,
+`{entities.harbor_bell.attributes.rung}`, and
+`{regions.fountain.rooms.0,0.attributes.visited}`.
 
 As shown in Step 3, room messages are stored under `"message"` and their
 content is in `"text"`. Text can be one string or a list of strings. For a

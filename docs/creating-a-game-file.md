@@ -309,6 +309,47 @@ written as one object or a list of objects:
   `"set_attribute"`, this event does not create missing members. A zero value
   is allowed except as the divisor for `"/"`. Invalid events display an error
   and do not modify game data.
+- `"input"` prompts the player for a value and stores it at the dotted
+  `"target"` path. Set `"input_type"` to `"string"` (the default), `"integer"`,
+  `"number"`, `"boolean"`, or `"choice"`. Integer and number events may set
+  inclusive `"min"` and `"max"` limits. Boolean input accepts `y`, `yes`, `n`,
+  or `no` and stores a JSON boolean. Choice input requires a non-empty
+  `"choices"` array of strings; the player can enter either a choice number
+  or its text. Invalid input is rejected and prompted again. An optional
+  `"response"` string or list of strings is shown after the value is stored,
+  and supports the usual dialogue placeholders.
+
+To prompt when a game is first played, add an `"on_start"` event or list of
+events at the root of the game file. For example, this asks for a player name
+and age before entering the starting room:
+
+```json
+{
+    "on_start": [
+        {
+            "type": "input",
+            "target": "player.name",
+            "input_type": "string",
+            "prompt": "What is your name?",
+            "response": "Welcome, {player.name}!"
+        },
+        {
+            "type": "input",
+            "target": "player.attributes.age",
+            "input_type": "integer",
+            "prompt": "How old are you?",
+            "min": 1,
+            "max": 120
+        }
+    ]
+}
+```
+
+`"on_start"` runs only once per save file, after the game's introduction and
+before the player enters the starting room. Its completion is saved
+automatically, so loading a save later does not repeat the prompts. Input
+events can also be used in the `"events"` lists on connections and entity
+interactions.
 
 ## 5. Connect Rooms
 
@@ -397,8 +438,9 @@ If a condition fails, the `"failure"` message is shown and the player does not
 move. If all conditions pass, the `"success"` message is shown and events run.
 Events can be one object or a list of objects. Supported event types are
 `"remove_item"` (removes the specified item from the player's inventory),
-`"set_attribute"` (assigns `"value"` to the dotted `"target"` path), and
-`"modify_attribute"` (performs arithmetic on an existing numeric target).
+`"set_attribute"` (assigns `"value"` to the dotted `"target"` path),
+`"modify_attribute"` (performs arithmetic on an existing numeric target), and
+`"input"` (prompts the player and stores a typed response at `"target"`).
 
 `"success"` can be used without conditions. Set `"repeat_condition": false`
 and start `"condition_executed"` as `false` to run the connection's checks,

@@ -186,6 +186,142 @@ class Game:
         self.apply_events(condition_parent.get("events"))
         return True
 
+    def get_player_input(self, event: dict) -> tuple[bool, object]:
+        """Prompt for and validate a typed value described by an input event."""
+        input_type = event.get("input_type", "string")
+        prompt = event.get("prompt", "Enter a value:")
+        if input_type not in ("string", "integer", "number", "boolean", "choice"):
+            self.display.text(
+                self.display.format(
+                    f"Error: Unsupported input_type '{input_type}'.",
+                    ansi_format="error",
+                )
+            )
+            return False, None
+        if not isinstance(prompt, str):
+            self.display.text(
+                self.display.format(
+                    "Error: input prompt must be a string.",
+                    ansi_format="error",
+                )
+            )
+            return False, None
+
+        minimum = event.get("min")
+        maximum = event.get("max")
+        if input_type in ("integer", "number"):
+            valid_bounds = all(
+                value is None
+                or (
+                    isinstance(value, (int, float))
+                    and not isinstance(value, bool)
+                    and (
+                        not isinstance(value, float)
+                        or math.isfinite(value)
+                    )
+                    and (input_type != "integer" or isinstance(value, int))
+                )
+                for value in (minimum, maximum)
+            )
+            if (
+                not valid_bounds
+                or minimum is not None
+                and maximum is not None
+                and minimum > maximum
+            ):
+                self.display.text(
+                    self.display.format(
+                        f"Error: Invalid {input_type} input bounds.",
+                        ansi_format="error",
+                    )
+                )
+                return False, None
+        elif minimum is not None or maximum is not None:
+            self.display.text(
+                self.display.format(
+                    "Error: min and max can only be used with integer or number input.",
+                    ansi_format="error",
+                )
+            )
+            return False, None
+
+        choices = event.get("choices")
+        if input_type == "choice":
+            if (
+                not isinstance(choices, list)
+                or not choices
+                or any(not isinstance(choice, str) or not choice for choice in choices)
+            ):
+                self.display.text(
+                    self.display.format(
+                        "Error: choice input requires a non-empty list of strings.",
+                        ansi_format="error",
+                    )
+                )
+                return False, None
+        elif choices is not None:
+            self.display.text(
+                self.display.format(
+                    "Error: choices can only be used with choice input.",
+                    ansi_format="error",
+                )
+            )
+            return False, None
+
+        while True:
+            self.display.text(self.format_text(prompt))
+            if input_type == "choice":
+                for index, choice in enumerate(choices, start=1):
+                    self.display.text(f"[{index}] {self.format_text(choice)}")
+            raw_value = input("> ").strip()
+
+            try:
+                match input_type:
+                    case "string":
+                        value = raw_value
+                    case "integer":
+                        value = int(raw_value)
+                    case "number":
+                        value = float(raw_value)
+                        if not math.isfinite(value):
+                            raise ValueError
+                    case "boolean":
+                        match raw_value.lower():
+                            case "y" | "yes":
+                                value = True
+                            case "n" | "no":
+                                value = False
+                            case _:
+                                raise ValueError
+                    case "choice":
+                        value = next(
+                            choice
+                            for index, choice in enumerate(choices, start=1)
+                            if choice.casefold() == raw_value.casefold()
+                            or str(index) == raw_value
+                        )
+            except (StopIteration, ValueError):
+                self.display.text(
+                    self.display.format(
+                        "Invalid input. Please try again.",
+                        ansi_format="error",
+                    )
+                )
+                continue
+
+            if input_type in ("integer", "number") and (
+                minimum is not None and value < minimum
+                or maximum is not None and value > maximum
+            ):
+                self.display.text(
+                    self.display.format(
+                        "Input is outside the allowed range. Please try again.",
+                        ansi_format="error",
+                    )
+                )
+                continue
+            return True, value
+
     def apply_events(self, events: dict | list[dict] | None) -> None:
         """Apply game events shared by connections and entity interactions."""
         data = self.game_data.data
@@ -194,6 +330,14 @@ class Game:
             if isinstance(events, dict):
                 events = [events]
             for event in events:
+                if not isinstance(event, dict):
+                    self.display.text(
+                        self.display.format(
+                            "Error: Each event must be an object.",
+                            ansi_format="error",
+                        )
+                    )
+                    continue
                 match event.get("type"):
                     case "remove_item":
                         event_item = event.get("item")
@@ -218,6 +362,60 @@ class Game:
                                 member[key] = child
                             member = child
                         member[path[-1]] = event.get("value")
+                    case "input":
+                        target = event.get("target")
+                        if not isinstance(target, str) or not target:
+                            self.display.text(
+                                self.display.format(
+                                    "Error: input requires a target path.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        path = self.get_data_path(target)
+                        if path is None or len(path) < 2:
+                            self.display.text(
+                                self.display.format(
+                                    f"Error: Invalid input target '{target}'.",
+                                    ansi_format="error",
+                                )
+                            )
+                            continue
+
+                        valid, value = self.get_player_input(event)
+                        if not valid:
+                            continue
+
+                        member = data
+                        for key in path[:-1]:
+                            child = member.get(key)
+                            if not isinstance(child, dict):
+                                child = {}
+                                member[key] = child
+                            member = child
+                        member[path[-1]] = value
+
+                        response = event.get("response")
+                        if response:
+                            if not isinstance(response, (str, list)):
+                                self.display.text(
+                                    self.display.format(
+                                        "Error: input response must be a string or list of strings.",
+                                        ansi_format="error",
+                                    )
+                                )
+                            elif isinstance(response, list) and any(
+                                not isinstance(line, str) for line in response
+                            ):
+                                self.display.text(
+                                    self.display.format(
+                                        "Error: input response must contain only strings.",
+                                        ansi_format="error",
+                                    )
+                                )
+                            else:
+                                self.loop_dialogue(response)
                     case "modify_attribute":
                         target = event.get("target")
                         if not isinstance(target, str) or not target:
@@ -493,6 +691,11 @@ class Game:
             self.await_input()
             return
 
+        if data.get("on_start") and not data.get("on_start_executed", False):
+            self.apply_events(data["on_start"])
+            data["on_start_executed"] = True
+            self.game_data.save_game_file()
+
         self.enter_room()
         if data.get("completed"):
             return
@@ -541,8 +744,6 @@ class Game:
             if can_drop:
                 item_options[option_index] = "Drop one"
                 option_index += 1
-
-            # TODO Add inventory interactions
 
             item_options["0"] = "Back"
             drop_selection = text_display.ListMenu(

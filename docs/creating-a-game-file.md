@@ -325,7 +325,7 @@ support may display it differently, and disabling text formatting removes it.
                     "item": "iron_key"
                 },
                 {
-                    "type": "attribute_equals",
+                    "type": "attribute_equals_value",
                     "attribute": "world.bell_rung",
                     "value": true
                 }
@@ -358,12 +358,22 @@ Every condition in the `"conditions"` list must pass. Supported conditions are:
   to require between two and four. Counts must be positive integers, and
   combined bounds must be consistent. Set `"object": "entities.guard"` to
   check that object's inventory.
-- `"attribute_equals"` — the game-data path in `"attribute"` must exist and
-  equal `"value"`. Use `"world.attribute_name"` to read a member of the root
-  `"attributes"` object, such as the value set by the bell interaction above.
-  Attributes on individual objects use their full path, for example
-  `"player.attributes.health"` or
+- `"attribute_equals_value"` — the game-data path in `"attribute"` must exist
+  and equal the constant `"value"`. Use `"world.attribute_name"` to read a
+  member of the root `"attributes"` object, such as the value set by the bell
+  interaction above. Attributes on individual objects use their full path,
+  for example `"player.attributes.health"` or
   `"regions.fountain.rooms.0,0.attributes.visited"`.
+- `"attributes_equal"` — both `"attribute"` and `"other_attribute"` must be
+  valid game-data paths, and their values must be equal. For example:
+
+  ```json
+  {
+      "type": "attributes_equal",
+      "attribute": "player.attributes.key_code",
+      "other_attribute": "entities.door.attributes.required_code"
+  }
+  ```
 
 If a condition fails, the `"failure"` message is shown and the player does not
 move. If all conditions pass, the `"success"` message is shown and events run.

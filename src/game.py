@@ -145,12 +145,22 @@ class Game:
                         )
                     ):
                         return False
-                case "attribute_equals":
+                case "attribute_equals_value":
                     attribute = condition.get("attribute")
                     if not isinstance(attribute, str):
                         return False
                     found, actual_value = self.get_attribute_value(attribute)
                     if not found or actual_value != condition.get("value"):
+                        return False
+                case "attributes_equal":
+                    attribute = condition.get("attribute")
+                    other_attribute = condition.get("other_attribute")
+                    if not isinstance(attribute, str) or not isinstance(other_attribute, str):
+                        return False
+
+                    found, actual_value = self.get_attribute_value(attribute)
+                    other_found, other_value = self.get_attribute_value(other_attribute)
+                    if not found or not other_found or actual_value != other_value:
                         return False
                 case _:
                     return False

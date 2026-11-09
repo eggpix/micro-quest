@@ -31,7 +31,12 @@ class Game:
 
     def await_input(self) -> None:
         """Pause until the player presses Enter."""
-        input(f"{self.display.format("[Enter]", ansi_format="key")} to continue... ")
+        try:
+            input(
+                f"{self.display.format('[Enter]', ansi_format='key')} to continue... "
+            )
+        except EOFError:
+            return
 
     def format_text(self, text: str) -> str:
         def replace(match):
@@ -273,7 +278,10 @@ class Game:
             if input_type == "choice":
                 for index, choice in enumerate(choices, start=1):
                     self.display.text(f"[{index}] {self.format_text(choice)}")
-            raw_value = input("> ").strip()
+            try:
+                raw_value = input("> ").strip()
+            except EOFError:
+                return False, None
 
             try:
                 match input_type:

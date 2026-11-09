@@ -46,8 +46,11 @@ class MainMenu:
             self.display.text(
                 f"Current working directory: {self.display.format(str(Path.cwd()), ansi_format="path")}"
             )
-            self.display.text(f"{self.display.format("[0]", ansi_format="key")} Cancel")
-            file_path = input("> ")
+            self.display.text(f"{self.display.format('[0]', ansi_format='key')} Cancel")
+            try:
+                file_path = input("> ")
+            except EOFError:
+                return
             if file_path == "0":
                 return
             if self.load_game(file_path):
@@ -86,8 +89,11 @@ class MainMenu:
                 "Enter a file path to create a new copy "
                 f"(default: {self.display.format(str(default_path), ansi_format="path")})."
             )
-            self.display.text(f"{self.display.format("[0]", ansi_format="key")} Cancel")
-            destination = input("> ").strip()
+            self.display.text(f"{self.display.format('[0]', ansi_format='key')} Cancel")
+            try:
+                destination = input("> ").strip()
+            except EOFError:
+                return False
             if destination == "0":
                 return False
             destination = destination or str(default_path)
@@ -140,7 +146,11 @@ class MainMenu:
                     f"Load game {self.display.format(last_save_file, ansi_format="path")}?"
                 )
                 self.display.text(self.display.format("[Y/N]", ansi_format="key"))
-                if input("> ").strip().lower() in ("y", "yes"):
+                try:
+                    choice = input("> ").strip().lower()
+                except EOFError:
+                    return
+                if choice in ("y", "yes"):
                     self.play_game()
         else:
             self.display.text("No last save file found.")

@@ -34,24 +34,27 @@ class Config:
             create_config = True
         except json.JSONDecodeError as error:
             self.display.text(
-                self.display.error(
-                    f"Error: Invalid JSON in '{self.filename}': {error}. Using defaults."
+                self.display.format(
+                    f"Error: Invalid JSON in '{self.filename}': {error}. Using defaults.",
+                    ansi_format="error",
                 )
             )
             data = {}
         except OSError as error:
             self.display.text(
-                self.display.error(
-                    f"Error: Could not read '{self.filename}': {error}. Using defaults."
+                self.display.format(
+                    f"Error: Could not read '{self.filename}': {error}. Using defaults.",
+                    ansi_format="error",
                 )
             )
             data = {}
 
         if not isinstance(data, dict):
             self.display.text(
-                self.display.error(
+                self.display.format(
                     f"Error: Configuration in '{self.filename}' must be a JSON object. "
-                    "Using defaults."
+                    "Using defaults.",
+                    ansi_format="error",
                 )
             )
             data = {}
@@ -62,9 +65,10 @@ class Config:
         for key, default_value in self.DEFAULT_DATA.items():
             if type(config_data[key]) is not type(default_value):
                 self.display.text(
-                    self.display.error(
+                    self.display.format(
                         f"Error: Invalid value for '{key}' in '{self.filename}'. "
-                        "Using the default."
+                        "Using the default.",
+                        ansi_format="error",
                     )
                 )
                 config_data[key] = default_value
@@ -84,7 +88,8 @@ class Config:
                 json.dump(self.data, file, indent=4)
         except (OSError, TypeError, ValueError) as error:
             self.display.text(
-                self.display.error(
-                    f"Error: Could not save configuration to '{self.filename}': {error}"
+                self.display.format(
+                    f"Error: Could not save configuration to '{self.filename}': {error}",
+                    ansi_format="error",
                 )
             )

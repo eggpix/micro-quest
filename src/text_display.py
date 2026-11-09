@@ -138,7 +138,6 @@ class TextDisplay:
 
     def text(self, text: str) -> None:
         """Display formatted text according to configuration."""
-        
         print(self.format(text))
 
 
@@ -177,7 +176,10 @@ class ListMenu:
         """Display the menu until the user enters a valid selection."""
         while True:
             self.show()
-            selection = input("> ").lower().strip()
+            try:
+                selection = input("> ").lower().strip()
+            except EOFError:
+                return "0"
 
             if selection in [option.lower() for option in self.options]:
                 return selection

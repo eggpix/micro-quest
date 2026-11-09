@@ -319,6 +319,127 @@ written as one object or a list of objects:
   `"response"` string or list of strings is shown after the value is stored,
   and supports the usual dialogue placeholders.
 
+### Add an NPC
+
+NPCs use the same entity and interaction system as other room objects. Add the
+NPC's key to a room's `"items"` array, define it in the root `"entities"`
+object, and set `"item": false` so it cannot be picked up. Use the NPC's
+`"name"` for its display name and `"interactions"` for conversation choices.
+An interaction can use a `"message"` for a one-shot exchange, or `"start_node"`
+to begin a branching conversation defined by the entity's `"dialogue"` object.
+
+```json
+{
+    "regions": {
+        "fountain": {
+            "rooms": {
+                "0,0": {
+                    "items": ["old_sailor"]
+                }
+            }
+        }
+    },
+    "entities": {
+        "old_sailor": {
+            "name": "Old Sailor",
+            "item": false,
+            "attributes": {
+                "met": false
+            },
+            "interactions": {
+                "talk": {
+                    "name": "Talk",
+                    "start_node": "greeting"
+                }
+            },
+            "dialogue": {
+                "greeting": {
+                    "message": [
+                        "The sailor looks up from the harbor.",
+                        "\"Good day, {player.name}. The sea is calm for now.\""
+                    ],
+                    "choices": [
+                        {
+                            "text": "Ask about the storm",
+                            "next": "storm"
+                        },
+                        {
+                            "text": "Ask about the harbor bell",
+                            "next": "bell",
+                            "conditions": [
+                                {
+                                    "type": "attribute_equals_value",
+                                    "attribute": "entities.old_sailor.attributes.met",
+                                    "value": true
+                                }
+                            ]
+                        },
+                        {
+                            "text": "Say goodbye",
+                            "events": {
+                                "type": "set_attribute",
+                                "target": "entities.old_sailor.attributes.met",
+                                "value": true
+                            }
+                        }
+                    ]
+                },
+                "storm": {
+                    "message": "\"It came in from the east, without warning.\"",
+                    "choices": [
+                        {
+                            "text": "Thank him and leave",
+                            "events": {
+                                "type": "set_attribute",
+                                "target": "entities.old_sailor.attributes.met",
+                                "value": true
+                            }
+                        },
+                        {
+                            "text": "Ask about the harbor bell",
+                            "next": "bell",
+                            "conditions": [
+                                {
+                                    "type": "attribute_equals_value",
+                                    "attribute": "entities.old_sailor.attributes.met",
+                                    "value": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "bell": {
+                    "message": "\"I heard it ring just before the storm.\""
+                }
+            }
+        }
+    }
+}
+```
+
+An NPC remains in the room after a conversation. Its attributes are stored with
+its entity definition and saved with the game, so events can track persistent
+facts such as whether the player has met the character.
+
+For a dialogue tree, set an interaction's `"start_node"` to a key in the
+entity's `"dialogue"` object. Each node needs a `"message"` (a string or list
+of strings) and may have a `"choices"` array. Each choice needs `"text"` and
+may include:
+
+- `"conditions"` — a list of existing game conditions; every condition must
+  pass for the choice to be shown. Choices that fail their conditions are
+  hidden.
+- `"next"` — the key of another node to show after this choice. Omit `"next"`
+  to end the conversation after selecting the choice.
+- `"events"` — one event or a list of events to apply after the player selects
+  the choice and before the next node is shown.
+
+If a node has no available choices, its message is shown and the conversation
+ends. Otherwise, the player can select **End conversation** to leave at any
+time. A missing node or malformed dialogue definition reports an error instead
+of silently continuing. Existing interactions with `"message"` and `"events"`
+remain supported and do not need to be converted to dialogue trees.
+
 To prompt when a game is first played, add an `"on_start"` event or list of
 events at the root of the game file. For example, this asks for a player name
 and age before entering the starting room:

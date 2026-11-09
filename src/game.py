@@ -549,6 +549,116 @@ class Game:
             and entity.get("item", True) is not False
         )
 
+    def run_dialogue_tree(
+        self, entity: dict, interaction: dict, entity_id: str
+    ) -> None:
+        """Run an NPC conversation whose choices lead between named nodes."""
+        nodes = entity.get("dialogue")
+        node_id = interaction.get("start_node")
+        if (
+            not isinstance(nodes, dict)
+            or not isinstance(node_id, str)
+            or not node_id
+        ):
+            self.display.text(
+                self.display.format(
+                    f"Error: Invalid dialogue tree for '{entity_id}'.",
+                    ansi_format="error",
+                )
+            )
+            return
+
+        while True:
+            node = nodes.get(node_id)
+            if not isinstance(node, dict):
+                self.display.text(
+                    self.display.format(
+                        f"Error: Dialogue node '{node_id}' not found for "
+                        f"'{entity_id}'.",
+                        ansi_format="error",
+                    )
+                )
+                return
+
+            message = node.get("message")
+            if isinstance(message, str):
+                self.loop_dialogue(message)
+            elif (
+                isinstance(message, list)
+                and all(isinstance(line, str) for line in message)
+            ):
+                self.loop_dialogue(message)
+            else:
+                self.display.text(
+                    self.display.format(
+                        f"Error: Dialogue node '{node_id}' for '{entity_id}' "
+                        "needs a message string or list of strings.",
+                        ansi_format="error",
+                    )
+                )
+                return
+
+            choices = node.get("choices", [])
+            if not isinstance(choices, list) or not all(
+                isinstance(choice, dict) for choice in choices
+            ):
+                self.display.text(
+                    self.display.format(
+                        f"Error: Choices for dialogue node '{node_id}' must "
+                        "be a list of objects.",
+                        ansi_format="error",
+                    )
+                )
+                return
+
+            available_choices = []
+            for choice in choices:
+                choice_text = choice.get("text")
+                next_node = choice.get("next")
+                conditions = choice.get("conditions", [])
+                if (
+                    not isinstance(choice_text, str)
+                    or not choice_text
+                    or (
+                        next_node is not None
+                        and (not isinstance(next_node, str) or not next_node)
+                    )
+                    or not isinstance(conditions, list)
+                    or not all(isinstance(condition, dict) for condition in conditions)
+                ):
+                    self.display.text(
+                        self.display.format(
+                            f"Error: Invalid choice in dialogue node "
+                            f"'{node_id}' for '{entity_id}'.",
+                            ansi_format="error",
+                        )
+                    )
+                    return
+
+                if self.conditions_met(conditions):
+                    available_choices.append(choice)
+
+            if not available_choices:
+                return
+
+            options = {
+                str(index + 1): choice["text"]
+                for index, choice in enumerate(available_choices)
+            }
+            options["0"] = "End conversation"
+            selection = text_display.ListMenu(
+                entity.get("name") or entity_id, options, self.display
+            ).get_input()
+            if selection == "0":
+                return
+
+            selected_choice = available_choices[int(selection) - 1]
+            self.apply_events(selected_choice.get("events"))
+            next_node = selected_choice.get("next")
+            if next_node is None:
+                return
+            node_id = next_node
+
     def view_room_items(self) -> None:
         """Show items in the current room and collect eligible items."""
         room_items = self.world.get_room_items()
@@ -617,15 +727,18 @@ class Game:
             interaction = list(interactions.values())[
                 int(interaction_selection) - 1
             ]
-            message = interaction.get("message")
-            if message:
-                self.loop_dialogue(message)
+            if "start_node" in interaction:
+                self.run_dialogue_tree(entity, interaction, item)
             else:
-                self.display.text(
-                    f"{interaction.get("name") or "Interaction"} has no response."
-                )
-                self.await_input()
-            self.apply_events(interaction.get("events"))
+                message = interaction.get("message")
+                if message:
+                    self.loop_dialogue(message)
+                else:
+                    self.display.text(
+                        f"{interaction.get("name") or "Interaction"} has no response."
+                    )
+                    self.await_input()
+                self.apply_events(interaction.get("events"))
             return
 
         if not is_collectable:

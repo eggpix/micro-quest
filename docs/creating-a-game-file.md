@@ -347,7 +347,12 @@ support may display it differently, and disabling text formatting removes it.
 
 Every condition in the `"conditions"` list must pass. Supported conditions are:
 
-- `"has_item"` — `"item"` must be present in the player's inventory.
+- `"has_item"` — `"item"` must be present in the selected object's
+  `"inventory"`. `"object"` is an optional dotted path to that object and
+  defaults to `"player"`; `"quantity"` is an optional minimum count and
+  defaults to `1`. For example, use
+  `{"type": "has_item", "item": "iron_key", "quantity": 2}` to require two
+  keys, or set `"object": "entities.guard"` to check that object's inventory.
 - `"attribute_equals"` — the game-data path in `"attribute"` must exist and
   equal `"value"`. Use `"world.attribute_name"` to read a member of the root
   `"attributes"` object, such as the value set by the bell interaction above.

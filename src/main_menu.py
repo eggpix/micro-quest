@@ -102,6 +102,7 @@ class MainMenu:
                     "A file already exists at "
                     f"'{self.display.format(destination, ansi_format="path")}'. Choose another path."
                 )
+                self.await_input()
                 continue
 
             self.game_data.data["status"] = "active"

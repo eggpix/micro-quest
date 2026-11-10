@@ -3,24 +3,34 @@
     "description": "It's time to leave your home behind. Ring the bell to mark your departure.",
     "status": "template",
     "player": {
-        "region": "east_bell_tower",
+        "region": "bell_tower",
         "room_position": [
             0,
             0
         ]
     },
     "regions": {
-        "east_bell_tower": {
-            "name": "East Bell Tower",
+        "bell_tower": {
+            "name": "Central Bell Tower",
             "rooms": {
                 "0,0": {},
                 "1,0": {},
                 "2,0": {},
-                "3,0": {}
+                "3,0": {
+                    "items": [
+                        "grand_bell"
+                    ]
+                },
+                "4,0": {},
+                "5,0": {},
+                "6,0": {}
             }
         }
     },
     "entities": {
-        
+        "grand_bell": {
+            "name": "Grand Bell",
+            "description": "The Grand Bell oversees the entire kingdom. Rulers who are deemed worthy and served their people well will be sent to a new land once the bell is rung."
+        }
     }
 }

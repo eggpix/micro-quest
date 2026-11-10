@@ -694,7 +694,7 @@ class Game:
             elif is_collectable:
                 action = f"Pick up {entity_name}"
             else:
-                action = f"{entity_name} (not collectable)"
+                action = entity_name
 
             options[option] = action
             option_items[option] = (index, item)
@@ -726,8 +726,14 @@ class Game:
                 interaction_options[pickup_option] = "Pick up"
             interaction_options["0"] = "Back"
 
+            description = entity.get("description") or (
+                "No additional information for this item."
+            )
             interaction_selection = text_display.ListMenu(
-                entity_name, interaction_options, self.display
+                entity_name,
+                interaction_options,
+                self.display,
+                description=self.display.format(description, ansi_format="hint"),
             ).get_input()
             if interaction_selection == "0":
                 return
@@ -754,8 +760,15 @@ class Game:
             return
 
         if not is_collectable:
-            self.display.text(f"You cannot pick up {entity.get("name") or item}.")
-            self.await_input()
+            description = entity.get("description") or (
+                "No additional information for this item."
+            )
+            text_display.ListMenu(
+                entity_name,
+                {"0": "Back"},
+                self.display,
+                description=self.display.format(description, ansi_format="hint"),
+            ).get_input()
             return
 
         self.collect_room_item(index, item, entity)

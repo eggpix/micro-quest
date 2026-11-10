@@ -74,7 +74,7 @@ class MainMenu:
         elif data.get("status") == "linked" and data.get("link"):
             if not self.game_data.copy_game_file(data.get("link"), overwrite=True):
                 return False
-            self.display.text("Copying game from linked file... ")
+            self.display.text("Copied game from linked file... ")
             self.await_input()
 
         self.store_last_save(file_path)

@@ -210,6 +210,8 @@ Let's add a message to one of the rooms. This message will play when the player 
 `"played"` to `true` after displaying it. Set `"played": false` when starting
 a new game.
 
+> Every room has a special member called "visited" that appears after a player has visited it. This should not be modified when creating a game, but it can be accessed by conditions and events.
+
 ## 4. Add Collectable Items
 
 Rooms can contain items using an `"items"` array. Each item refers to an entity

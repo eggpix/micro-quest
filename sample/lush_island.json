@@ -1,8 +1,7 @@
 {
     "title": "Lush Island",
     "description": "It's time to leave your home behind. Ring the bell to mark your departure.",
-    "status": "linked",
-    "link": "sample/lush_island.json",
+    "status": "template",
     "player": {
         "region": "east_bell_tower",
         "room_position": [
@@ -16,8 +15,12 @@
             "rooms": {
                 "0,0": {},
                 "1,0": {},
-                "2,0": {}
+                "2,0": {},
+                "3,0": {}
             }
         }
+    },
+    "entities": {
+        
     }
 }

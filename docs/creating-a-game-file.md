@@ -284,6 +284,16 @@ An entity with `"item": false` cannot be picked up, even if it is also marked
 in the room-item menu. If an interactable entity is also collectable, its
 interaction menu includes a separate **Pick up** choice.
 
+An interaction may also use `"conditions"` to control whether its action
+succeeds. Every condition must pass. If one fails, the `"failure.message"` is
+shown and the action's success message and events are skipped. When all
+conditions pass, `"success.message"` is shown and `"success.events"` are run.
+The existing top-level `"message"` and `"events"` members remain supported;
+for a conditioned interaction, the top-level message is used if there is no
+success message, and top-level events are used if `"success.events"` is absent.
+Conditions use the same types and dotted game-data paths documented for room
+connections below.
+
 An interaction may include `"events"` to change game state after its message
 is shown. Events use the same event system as room connections and can be
 written as one object or a list of objects:

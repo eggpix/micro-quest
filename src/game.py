@@ -181,18 +181,23 @@ class Game:
         """Evaluate conditions and run their associated messages and events."""
         if not self.conditions_met(condition_parent.get("conditions", [])):
             failure = condition_parent.get("failure")
-            failure_dialogue = failure.get("message") if failure else None
+            failure_dialogue = (
+                failure.get("message") if isinstance(failure, dict) else None
+            )
             if failure_dialogue:
                 self.loop_dialogue(failure_dialogue)
             return False
 
         success = condition_parent.get("success")
-        if success:
+        if isinstance(success, dict):
             success_dialogue = success.get("message")
             if success_dialogue:
                 self.loop_dialogue(success_dialogue)
 
-        self.apply_events(condition_parent.get("events"))
+        events = condition_parent.get("events")
+        if isinstance(success, dict) and "events" in success:
+            events = success["events"]
+        self.apply_events(events)
         return True
 
     def get_player_input(self, event: dict) -> tuple[bool, object]:
@@ -747,6 +752,20 @@ class Game:
             ]
             if "start_node" in interaction:
                 self.run_dialogue_tree(entity, interaction, item)
+            elif any(
+                key in interaction
+                for key in ("conditions", "success", "failure")
+            ):
+                if not self.check_conditions(interaction):
+                    return
+
+                success = interaction.get("success")
+                if not (
+                    isinstance(success, dict) and success.get("message")
+                ):
+                    message = interaction.get("message")
+                    if message:
+                        self.loop_dialogue(message)
             else:
                 message = interaction.get("message")
                 if message:

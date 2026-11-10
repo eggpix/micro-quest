@@ -36,7 +36,48 @@
     "entities": {
         "grand_bell": {
             "name": "Grand Bell",
-            "description": "The Grand Bell oversees the entire kingdom. Rulers who are deemed worthy and served their people well will be sent to a new land once the bell is rung."
+            "description": "The Grand Bell oversees the entire kingdom. Rulers who are deemed worthy and served their people well will be sent to a new land once the bell is rung.",
+            "interactions": {
+                "inspect": {
+                    "name": "Inspect",
+                    "message": [
+                        "You look at the bell closely. It's made of bronze shiner than you've ever seen. They must polish it often.",
+                        "There's a small inscription on the bell. It has the name \"Arthur Carlson\" written in bold letters."
+                    ],
+                    "events": {
+                        "type": "set_attribute",
+                        "target": "entities.grand_bell.attributes.inspected",
+                        "value": true
+                    }
+                },
+                "ring": {
+                    "name": "Ring",
+                    "conditions": [
+                        {
+                            "type": "attribute_equals_value",
+                            "attribute": "entities.grand_bell.attributes.inspected",
+                            "value": true
+                        }
+                    ],
+                    "success": {
+                        "message": "You ring the bell",
+                        "events": [
+                            {
+                                "type": "set_attribute",
+                                "target": "entities.grand_bell.attributes.rung",
+                                "value": true
+                            }
+                        ]
+                    },
+                    "failure": {
+                        "message": "I should inspect the bell before I ring it."
+                    }
+                }
+            },
+            "attributes": {
+                "inspected": false,
+                "rung": false
+            }
         }
     },
     "link": "sample/lush_island.json"

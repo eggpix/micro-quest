@@ -5,6 +5,7 @@ from typing import Any
 
 import game_data
 import text_display
+import config
 
 # An odd map size keeps the player's room centered.
 MAP_SIZE = 7
@@ -33,9 +34,11 @@ class World:
     def __init__(
         self,
         game_data_manager: game_data.GameData,
+        config: config.Config,
         display: text_display.TextDisplay,
     ) -> None:
         self.game_data = game_data_manager
+        self.config = config
         self.display = display
 
     @property
@@ -100,29 +103,39 @@ class World:
             cells: list[str] = []
             for x in range(map_left, map_right + 1):
                 position = (x, y)
-                if [x, y] == room_position:
-                    cells.append("[x]")
-                elif position in map_connections:
-                    direction, color, has_color = map_connections[position]
-                    cell = "[ ]"
-                    if has_color:
-                        try:
-                            cell = (
-                                self.display.color_foreground("[", color)
-                                + " "
-                                + self.display.color_foreground("]", color)
-                            )
-                        except ValueError as error:
-                            map_errors.append(
-                                self.display.format(
-                                    "Error: Invalid map_color for the "
-                                    f"{direction} connection: {error}",
-                                    ansi_format="error",
+                if f"{x},{y}" in rooms:
+
+                    visited = rooms.get(f"{x},{y}").get("visited", False)
+
+                    if [x, y] == room_position:
+                        cell = "[x]"
+                    else:
+                        cell = "[ ]"
+
+                    if position in map_connections:
+                        direction, color, has_color = map_connections[position]
+                        if has_color:
+                            try:
+                                cell = (
+                                    self.display.color_foreground(cell[0], color)
+                                    + cell[2]
+                                    + self.display.color_foreground(cell[2], color)
                                 )
-                            )
+                            except ValueError as error:
+                                map_errors.append(
+                                    self.display.format(
+                                        "Error: Invalid map_color for the "
+                                        f"{direction} connection: {error}",
+                                        ansi_format="error",
+                                    )
+                                )
+                    if visited and self.config.data.get("mark_visited", True):
+                        cell = (
+                            self.display.format(cell[0], ansi_format="grid")
+                            + cell[1]
+                            + self.display.format(cell[2], ansi_format="grid")
+                        )
                     cells.append(cell)
-                elif f"{x},{y}" in rooms:
-                    cells.append("[ ]")
                 else:
                     cells.append(
                         self.display.format(" . ", ansi_format="grid")
@@ -265,4 +278,5 @@ class World:
         )
         player["region"] = destination_region
         player["room_position"] = destination_position
+        current_room["visited"] = True
         enter_room()

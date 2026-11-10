@@ -3,5 +3,6 @@
     "text_formatting": true,
     "concatenate_dialogue": false,
     "wrap_text": true,
-    "last_save_file": "..\\starwell_lantern_copy.json"
+    "mark_visited": true,
+    "last_save_file": "test_game.json"
 }

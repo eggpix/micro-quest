@@ -117,6 +117,7 @@ class MainMenu:
             "2": ("text_formatting", "Toggle text formatting"),
             "3": ("concatenate_dialogue", "Toggle concatenate dialogue"),
             "4": ("wrap_text", "Toggle wrap text"),
+            "5": ("mark_visited", "Toggle mark visited rooms")
         }
         while True:
             options = {

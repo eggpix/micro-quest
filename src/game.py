@@ -27,7 +27,11 @@ class Game:
             self.await_input,
             self.play_game,
         )
-        self.world = world.World(self.game_data, self.display)
+        self.world = world.World(
+            self.game_data,
+            self.config,
+            self.display
+        )
 
     def await_input(self) -> None:
         """Pause until the player presses Enter."""

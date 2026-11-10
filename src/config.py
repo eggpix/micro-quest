@@ -14,6 +14,7 @@ class Config:
         "text_formatting": True,
         "concatenate_dialogue": False,
         "wrap_text": True,
+        "mark_visited": True,
         "last_save_file": "",
     }
 

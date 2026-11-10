@@ -23,6 +23,15 @@ To resume the last saved game without opening the menu:
 python src/main.py --last
 ```
 
+## Run tests
+
+The test suite uses Python's standard library and requires no additional
+packages:
+
+```shell
+python -m unittest discover -v
+```
+
 Template games create a separate active save when loaded. Active game files are
 updated in place, so make a copy before testing if you want to preserve the
 original.

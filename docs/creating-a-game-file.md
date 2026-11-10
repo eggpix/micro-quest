@@ -21,6 +21,10 @@ loaded, Micro Quest asks for a new save-file path and creates an `"active"`
 copy, leaving the template unchanged. Active files are played and saved in
 place, so make a backup before experimenting with an active game.
 
+While creating a game, it's helpful to set `"status"` to `"linked"` and add
+`"linked": "path/to/template.json"` to your JSON root object. This makes
+your game copy from the template every time you load it.
+
 ### Core JSON Members
 
 A playable game needs a `"player"` with a starting `"region"` and
@@ -32,7 +36,8 @@ and description.
 - `"description"` — Introductory text displayed below the title. Defaults to
   an empty string.
 - `"status"` — Set to `"template"` before sharing to ensure players get a
-  separate save file. Other values are loaded directly as active files.
+  separate save file. Other values are loaded directly as active files or
+  linked to a template for testing.
 - `"player"` — Player data, including the starting region and room.
 - `"regions"` — Regions and their rooms. Each room key is its coordinate in
   `"x,y"` form.

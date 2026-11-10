@@ -64,14 +64,15 @@ class GameData:
             self.display.text(self.display.format(f"Error: Could not save game data: {error}", ansi_format="error"))
             return False
 
-    def copy_game_file(self, file_path: str) -> bool:
-        """Create a new game file without overwriting an existing file."""
+    def copy_game_file(self, file_path: str, overwrite: bool = False) -> bool:
+        """Create a game file, optionally overwriting an existing file."""
         if self.data is None:
             self.display.text(self.display.format("Error: No game data loaded to save.", ansi_format="error"))
             return False
 
         try:
-            with open(file_path, "x", encoding="utf-8") as file:
+            mode = "w" if overwrite else "x"
+            with open(file_path, mode, encoding="utf-8") as file:
                 json.dump(self.data, file, indent=4)
             self.data_path = file_path
             return True

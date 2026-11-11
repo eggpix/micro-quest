@@ -7,7 +7,7 @@ files that describe the story, player, regions, rooms, items, and exits.
 
 ## Run the engine
 
-Use Python 3.10 or newer. From the repository directory, start the main menu:
+Use Python 3.12 or newer. From the repository directory, start the main menu:
 
 ```shell
 python src/main.py

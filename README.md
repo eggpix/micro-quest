@@ -3,6 +3,8 @@
 Micro Quest is a text-based adventure game engine. Games are written as JSON
 files that describe the story, player, regions, rooms, items, and exits.
 
+**Inspired by:** [QuestForge](https://github.com/Code2College-Content/elite-101-mw-b)
+
 ## Run the engine
 
 Use Python 3.10 or newer. From the repository directory, start the main menu:

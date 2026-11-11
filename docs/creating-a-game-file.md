@@ -22,7 +22,7 @@ copy, leaving the template unchanged. Active files are played and saved in
 place, so make a backup before experimenting with an active game.
 
 While creating a game, it's helpful to set `"status"` to `"linked"` and add
-`"linked": "path/to/template.json"` to your JSON root object. This makes
+`"link": "path/to/template.json"` to your JSON root object. This makes
 your game copy from the template every time you load it.
 
 ### Core JSON Members

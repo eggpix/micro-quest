@@ -7,7 +7,7 @@ files that describe the story, player, regions, rooms, items, and exits.
 
 ## Run the engine
 
-Use Python 3.12 or newer. From the repository directory, start the main menu:
+**Use Python 3.12 or newer.** From the repository directory, start the main menu:
 
 ```shell
 python src/main.py
@@ -24,6 +24,8 @@ To resume the last saved game without opening the menu:
 ```shell
 python src/main.py --last
 ```
+
+**If you are on Windows, you can quickly run Micro Quest by double-clicking the play.bat file from the file explorer.**
 
 ## Run tests
 

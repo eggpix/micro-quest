@@ -1,3 +1,14 @@
+"""
+
+RUN THIS FILE TO PLAY MICRO QUEST
+
+
+Arguments:
+-l, --last: Load the last played game
+-f, --file: Quickly load a game from file path
+
+"""
+
 import subprocess
 import sys
 from pathlib import Path

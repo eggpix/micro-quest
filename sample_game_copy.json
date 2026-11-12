@@ -5,9 +5,17 @@
     "player": {
         "region": "dream_st",
         "room_position": [
-            13,
-            23
-        ]
+            0,
+            15
+        ],
+        "attributes": {}
+    },
+    "entities": {
+        "lost_wallet": {
+            "name": "Lost Wallet",
+            "description": "Who does this belong to?",
+            "collectable": true
+        }
     },
     "regions": {
         "dream_st": {
@@ -46,40 +54,123 @@
                 "4,12": {},
                 "4,13": {},
                 "4,14": {},
-                "0,15": {},
+                "0,15": {
+                    "message": {
+                        "text": [
+                            "It's 7:58. You need to hurry!",
+                            "You start running"
+                        ]
+                    },
+                    "visited": true
+                },
                 "1,15": {},
                 "2,15": {},
                 "3,15": {},
                 "4,15": {},
                 "5,15": {},
                 "6,15": {},
-                "0,16": {},
-                "0,17": {},
-                "0,18": {},
-                "0,19": {},
-                "0,20": {},
-                "0,21": {},
-                "1,21": {},
-                "2,21": {},
-                "3,21": {},
-                "4,21": {},
-                "5,21": {},
-                "6,21": {},
-                "6,22": {},
-                "6,23": {},
-                "12,23": {},
+                "0,16": {
+                    "connections": {
+                        "up": {
+                            "events": {
+                                "type": "input",
+                                "target": "player.attributes.travel_style",
+                                "input_type": "choice",
+                                "choices": [
+                                    "Run",
+                                    "Walk"
+                                ],
+                                "prompt": [
+                                    "It's 7:58. You need to hurry!",
+                                    " - Should I start running?"
+                                ],
+                                "response": "You choose to {player.attributes.travel_style}."
+                            }
+                        }
+                    },
+                    "visited": true
+                },
+                "0,17": {
+                    "visited": true
+                },
+                "0,18": {
+                    "visited": true
+                },
+                "0,19": {
+                    "visited": true
+                },
+                "0,20": {
+                    "visited": true
+                },
+                "0,21": {
+                    "message": {
+                        "text": [
+                            "There's a street crossing here.",
+                            "You wait patiently for the cars to cross."
+                        ]
+                    },
+                    "visited": true
+                },
+                "1,21": {
+                    "visited": true
+                },
+                "2,21": {
+                    "visited": true
+                },
+                "3,21": {
+                    "visited": true
+                },
+                "4,21": {
+                    "visited": true
+                },
+                "5,21": {
+                    "visited": true
+                },
+                "6,21": {
+                    "visited": true
+                },
+                "6,22": {
+                    "visited": true
+                },
+                "6,23": {
+                    "visited": true
+                },
+                "12,23": {
+                    "visited": true
+                },
                 "13,23": {
                     "message": {
-                        "text": "Note to self: I need to make it to work before I'm late. It's already 7:56 and work starts at 8:00."
-                    }
+                        "text": " - Note to self: I need to make it to work before I'm late. It's already 7:56 and work starts at 8:00."
+                    },
+                    "visited": true
                 },
-                "6,24": {},
-                "7,24": {},
-                "8,24": {},
-                "9,24": {},
-                "10,24": {},
-                "11,24": {},
-                "12,24": {}
+                "6,24": {
+                    "visited": true
+                },
+                "7,24": {
+                    "visited": true
+                },
+                "8,24": {
+                    "visited": true
+                },
+                "9,24": {
+                    "message": {
+                        "text": "Someone's wallet is on the floor."
+                    },
+                    "items": [
+                        "lost_wallet"
+                    ],
+                    "visited": true
+                },
+                "10,24": {
+                    "visited": true
+                },
+                "11,24": {
+                    "visited": true
+                },
+                "12,24": {
+                    "visited": true
+                }
             }
         }
     },

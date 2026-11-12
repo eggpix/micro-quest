@@ -4,7 +4,16 @@
     "status": "template",
     "player": {
         "region": "dream_st",
-        "room_position": [13,23]
+        "room_position": [13,23],
+        "attributes": {
+        }
+    },
+    "entities": {
+        "lost_wallet": {
+            "name": "Lost Wallet",
+            "description": "Who does this belong to?",
+            "collectable": true
+        }
     },
     "regions": {
         "dream_st": {
@@ -43,7 +52,19 @@
                 "4,12": {},
                 "4,13": {},
                 "4,14": {},
-                "0,15": {},
+                "0,15": {
+                    "message": {
+                        "text": "It's 7:58. You need to hurry!"
+                    },
+                    "events": [
+                        {
+                            "type": "set_attribute",
+                            "target": "player.attributes.movement_type_0",
+                            "input": true,
+                            "input_type": "choice"
+                        }
+                    ]
+                },
                 "1,15": {},
                 "2,15": {},
                 "3,15": {},
@@ -55,7 +76,12 @@
                 "0,18": {},
                 "0,19": {},
                 "0,20": {},
-                "0,21": {},
+                "0,21": {
+                    "message": {
+                        "text": ["There's a street crossing here.",
+                                "You wait patiently for the cars to cross."]
+                    }
+                },
                 "1,21": {},
                 "2,21": {},
                 "3,21": {},
@@ -67,13 +93,20 @@
                 "12,23": {},
                 "13,23": {
                     "message": {
-                        "text": "Note to self: I need to make it to work before I'm late. It's already 7:56 and work starts at 8:00."
+                        "text": " - Note to self: I need to make it to work before I'm late. It's already 7:56 and work starts at 8:00."
                     }
                 },
                 "6,24": {},
                 "7,24": {},
                 "8,24": {},
-                "9,24": {},
+                "9,24": {
+                    "message": {
+                        "text": "Someone's wallet is on the floor."
+                    },
+                    "items": [
+                        "lost_wallet"
+                    ]
+                },
                 "10,24": {},
                 "11,24": {},
                 "12,24": {}

@@ -1,0 +1,16 @@
+{
+    "title": "Castle Game",
+    "description": "A game about castles.",
+    "status": "template",
+    "player": {
+        "region": "fountain",
+        "room_position": [0,0]
+    },
+    "regions": {
+        "fountain": {
+            "rooms": {
+                "0,0": {}
+            }
+        }
+    }
+}

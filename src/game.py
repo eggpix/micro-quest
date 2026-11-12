@@ -186,6 +186,9 @@ class Game:
             )
             if failure_dialogue:
                 self.loop_dialogue(failure_dialogue)
+            events = failure.get("events")
+            if events:
+                self.apply_events(events)
             return False
 
         success = condition_parent.get("success")
@@ -193,11 +196,9 @@ class Game:
             success_dialogue = success.get("message")
             if success_dialogue:
                 self.loop_dialogue(success_dialogue)
-
-        events = condition_parent.get("events")
-        if isinstance(success, dict) and "events" in success:
-            events = success["events"]
-        self.apply_events(events)
+            events = success.get("events")
+            if events:
+                self.apply_events(events)
         return True
 
     def get_player_input(self, event: dict) -> tuple[bool, object]:
@@ -813,6 +814,7 @@ class Game:
         played_dialogue = room_data.get("message", {}).get("played", False)
 
         room_events = room_data.get("events", {})
+        room_conditions = room_data.get("conditions", {})
 
         if room_dialogue:
             if not played_dialogue:
@@ -822,6 +824,9 @@ class Game:
 
         if room_events:
             self.apply_events(room_events)
+
+        if room_conditions:
+            self.check_conditions(room_data)
 
         if room_data.get("ending") and not self.game_data.data.get("completed"):
             player_data = self.game_data.data.get("player")

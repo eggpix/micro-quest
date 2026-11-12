@@ -27,3 +27,4 @@ Game start: The road. Crossing the street quickly.
       .
       .     ..
       .......
+q

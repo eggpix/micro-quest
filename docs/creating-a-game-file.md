@@ -296,7 +296,8 @@ connections below.
 
 An interaction may include `"events"` to change game state after its message
 is shown. Events use the same event system as room connections and can be
-written as one object or a list of objects:
+written as one object or a list of objects. Many different game objects can use
+events, including rooms.
 
 - `"remove_item"` removes the named `"item"` from the player's inventory.
 - `"set_attribute"` assigns `"value"` to the dotted `"target"` path. Use

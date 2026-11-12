@@ -179,13 +179,17 @@ class Game:
 
     def check_conditions(self, condition_parent: dict) -> bool:
         """Evaluate conditions and run their associated messages and events."""
-        if not self.conditions_met(condition_parent.get("conditions", [])):
+        conditions = condition_parent.get("conditions", [])
+        if not self.conditions_met(conditions):
             failure = condition_parent.get("failure")
             failure_dialogue = (
                 failure.get("message") if isinstance(failure, dict) else None
             )
             if failure_dialogue:
                 self.loop_dialogue(failure_dialogue)
+            events = failure.get("events")
+            if events:
+                self.apply_events(events)
             return False
 
         success = condition_parent.get("success")
@@ -193,11 +197,9 @@ class Game:
             success_dialogue = success.get("message")
             if success_dialogue:
                 self.loop_dialogue(success_dialogue)
-
-        events = condition_parent.get("events")
-        if isinstance(success, dict) and "events" in success:
-            events = success["events"]
-        self.apply_events(events)
+            events = success.get("events")
+            if events:
+                self.apply_events(events)
         return True
 
     def get_player_input(self, event: dict) -> tuple[bool, object]:
@@ -355,6 +357,12 @@ class Game:
                         )
                     )
                     continue
+                if event.get("replay") == False:
+                    if event.get("played"):
+                        return
+                    event["played"] = True
+                if event.get("message"):
+                    self.loop_dialogue(event.get("message"))
                 match event.get("type"):
                     case "remove_item":
                         event_item = event.get("item")
@@ -810,11 +818,20 @@ class Game:
         repeat_dialogue = room_data.get("message", {}).get("repeat", True)
         played_dialogue = room_data.get("message", {}).get("played", False)
 
+        room_events = room_data.get("events", {})
+        room_conditions = room_data.get("conditions", {})
+
         if room_dialogue:
             if not played_dialogue:
                 self.loop_dialogue(room_dialogue)
                 if not repeat_dialogue:
                     room_data["message"]["played"] = True
+
+        if room_events:
+            self.apply_events(room_events)
+
+        if room_conditions:
+            self.check_conditions(room_data)
 
         if room_data.get("ending") and not self.game_data.data.get("completed"):
             player_data = self.game_data.data.get("player")
@@ -916,6 +933,8 @@ class Game:
                 inventory[item] -= 1
             self.display.text(f"You dropped {entity.get("name") or item}.")
             self.await_input()
+
+        # MAIN GAME LOOP
 
         while True:
             self.display.clear_terminal()

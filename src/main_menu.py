@@ -79,6 +79,8 @@ class MainMenu:
                 return False
             self.game_data.data["status"] = "linked"
             self.game_data.data["link"] = linked_path
+            if not self.game_data.save_game_file():
+                return False
             self.display.text("Copied game from linked file... ")
             self.await_input()
 

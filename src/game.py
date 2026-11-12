@@ -810,11 +810,16 @@ class Game:
         repeat_dialogue = room_data.get("message", {}).get("repeat", True)
         played_dialogue = room_data.get("message", {}).get("played", False)
 
+        room_events = room_data.get("events", {})
+
         if room_dialogue:
             if not played_dialogue:
                 self.loop_dialogue(room_dialogue)
                 if not repeat_dialogue:
                     room_data["message"]["played"] = True
+
+        if room_events:
+            self.apply_events(room_events)
 
         if room_data.get("ending") and not self.game_data.data.get("completed"):
             player_data = self.game_data.data.get("player")
@@ -916,6 +921,8 @@ class Game:
                 inventory[item] -= 1
             self.display.text(f"You dropped {entity.get("name") or item}.")
             self.await_input()
+
+        # MAIN GAME LOOP
 
         while True:
             self.display.clear_terminal()

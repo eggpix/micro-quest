@@ -24,6 +24,8 @@ DIRECTIONS: dict[str, tuple[str, tuple[int, int]]] = {
     "D": ("right", (1, 0)),
 }
 
+# Callable objects for type hints
+
 ConditionChecker = Callable[[dict[str, Any]], bool]
 RoomEntryHandler = Callable[[], None]
 

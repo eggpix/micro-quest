@@ -179,7 +179,8 @@ class Game:
 
     def check_conditions(self, condition_parent: dict) -> bool:
         """Evaluate conditions and run their associated messages and events."""
-        if not self.conditions_met(condition_parent.get("conditions", [])):
+        conditions = condition_parent.get("conditions", [])
+        if not self.conditions_met(conditions):
             failure = condition_parent.get("failure")
             failure_dialogue = (
                 failure.get("message") if isinstance(failure, dict) else None
@@ -356,6 +357,10 @@ class Game:
                         )
                     )
                     continue
+                if event.get("replay") == False:
+                    if event.get("played"):
+                        return
+                    event["played"] = True
                 if event.get("message"):
                     self.loop_dialogue(event.get("message"))
                 match event.get("type"):

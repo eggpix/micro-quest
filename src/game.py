@@ -355,6 +355,8 @@ class Game:
                         )
                     )
                     continue
+                if event.get("message"):
+                    self.loop_dialogue(event.get("message"))
                 match event.get("type"):
                     case "remove_item":
                         event_item = event.get("item")
